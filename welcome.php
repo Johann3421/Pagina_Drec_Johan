@@ -2,18 +2,17 @@
 // welcome.php
 session_start();
 if (!isset($_SESSION['username'])) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit();
 }
 
 $persona = null;
 $dni_error = "";
 $nombre = "";
-$foto = ""; // Variable para almacenar la URL de la foto
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $token = 'apis-token-10779.deFjdQHVSuenRlLS27jpqtmQ0SJV4hfj';  // Token API
-    $dni = $_POST['dni'];
+    $dni = $_POST['dni'] ?? '';
+    $nombre = $_POST['nombre'] ?? '';
 
     // Validar si el DNI está vacío
     if (empty($dni)) {
@@ -42,13 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($persona->error)) {
             $dni_error = "No se encontró el DNI.";
         } else {
-            // Obtener nombre completo
             $nombre = $persona->nombres . " " . $persona->apellidoPaterno . " " . $persona->apellidoMaterno;
-
-            // Verificar si hay una URL de foto en la respuesta
-            if (isset($persona->foto)) {
-                $foto = $persona->foto; // Guardar la URL de la foto
-            }
         }
     }
 }
@@ -59,10 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="csrf-token" content="<?= isset($_SESSION['_token']) ? $_SESSION['_token'] : '' ?>">
+  <meta name="csrf-token" content="AwHz0tWjMBpWFfS0XyLgAQhEw3dNiztPFnaACgCt">
   <title>Portalweb | Registro Visitas</title>
   
   <link rel="icon" type="image/png" href="https://gestionportales.regionhuanuco.gob.pe/dist/img/favicon.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/dist/css/adminlte.css">
@@ -71,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .arriba1 { float: right; margin-left: 0; margin-bottom: 5px; display: block; margin-right: 5px; }
     .btn-group { display: block !important; }
     .head-modal { background-color: #1367C8; color: white; }
-    .foto { width: 100px; height: 100px; border-radius: 50%; } /* Estilo para la imagen */
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -89,11 +82,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
     <a href="/" class="brand-link">
       <img src="https://gestionportales.regionhuanuco.gob.pe/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">Administración</span>
     </a>
 
+    <!-- Sidebar -->
     <div class="sidebar">
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
@@ -104,10 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
       </div>
 
+      <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-            <a href="https://gestionportales.regionhuanuco.gob.pe" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
                 Principal
@@ -126,19 +122,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </a>
             <ul class="nav nav-treeview" style="display: block;">
               <li class="nav-item">
-                <a href="https://gestionportales.regionhuanuco.gob.pe/regvisitas" class="nav-link active">
+                <a href="#" class="nav-link active">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Registrar visitas</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="https://gestionportales.regionhuanuco.gob.pe/reportevisit" class="nav-link">
+                <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Reporte</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="https://gestionportales.regionhuanuco.gob.pe/reporte_extrenovisitas" class="nav-link">
+                <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Vista para exterior</p>
                 </a>
@@ -152,6 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   <!-- Content Wrapper -->
   <div class="content-wrapper" style="min-height: 678.031px;">
+    <!-- Content Header (Page header) -->
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
@@ -168,22 +165,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       </div>
     </section>
 
+    <!-- Main content -->
     <section class="content">
       <div id="myModal" class="modal fade" role="dialog"></div>
       <div class="row">
+        <!-- cargador empresa -->
         <div style="display: none;" id="cargador1" align="center">
-          <img src="https://gestionportales.regionhuanuco.gob.pe/app-assets/images/cargando.gif" align="middle" alt="cargador">
+          <img src="././imagenes/Cargando.gif" align="middle" alt="cargador">
           &nbsp;<label style="color:#3C8DBC">Realizando tarea solicitada ...</label>
         </div>
+        <!-- cargador 2 -->
         <div style="display: none;" id="cargador2" align="center">
-          <img src="https://gestionportales.regionhuanuco.gob.pe/app-assets/images/load.gif" align="middle" alt="cargador">
+          <img src="././imagenes/Loading_2.gif" align="middle" alt="cargador">
           &nbsp;<label style="color:#B9260E">Espere ...</label>
         </div>
       </div>
 
+      <!-- Formulario de Registro de Visita -->
       <div class="container-fluid">
         <form id="frmvisita" class="frmvisita" method="post">
-          <!-- Eliminar input de token si no estás manejando CSRF -->
+          <input type="hidden" name="_token" value="AwHz0tWjMBpWFfS0XyLgAQhEw3dNiztPFnaACgCt">
           <div class="row">
             <div class="col-sm-6">
               <div class="card card-primary">
@@ -194,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   <div class="row">
                     <div class="col-lg-3 col-md-3 col-sm-12">
                       <label for="ndocu">DNI:</label>
-                      <input type="text" maxlength="8" class="form-control form-control-sm" name="dni" id="ndocu" placeholder="Nro Documento" onkeypress="return esNumerico(event)" autofocus="">
+                      <input type="text" maxlength="8" class="form-control form-control-sm" name="dni" id="ndocu" placeholder="Nro Documento" onkeypress="return esNumerico(event)" onblur="buscarPorDNI()" value="<?= $dni ?>">
                       <div id="dni_error" class="text-danger" style="font-size: 12px;"><?= $dni_error ?></div>
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-12">
@@ -205,12 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       </div>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-12">
-                      <!-- Aquí se cargará la imagen -->
-                      <div id="foto">
-                        <?php if ($foto): ?>
-                          <img src="<?= $foto ?>" class="foto" alt="Foto de Visitante">
-                        <?php endif; ?>
-                      </div>
+                      <div id="foto"></div>
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-12">
                       <div class="form-group">
@@ -259,7 +255,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       </div>
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12">
-                      
+                      <div class="form-group">
+                        <label for="funcionario">Funcionario o Servidor Público:</label>
+                        <select id="funcionario" name="nomfuncionario" class="form-control select2 form-control-sm">
+                          <option value="0">&lt;&lt; SELECCIONE &gt;&gt;</option>
+                          <option value="BELKER IVAN PAULINO RAMOS">BELKER IVAN PAULINO RAMOS / VIGILANTE</option>
+                          <!-- Más opciones aquí -->
+                        </select>
+                        <div id="nomfuncionario_error" class="text-danger" style="font-size: 12px;"></div>
+                      </div>
                       <div class="form-group">
                         <label for="smotivo">Motivo de visita :</label>
                         <select id="smotivo" name="smotivo" class="form-control form-control-sm">
@@ -293,6 +297,104 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </div>
         </form>
       </div>
+
+      <!-- Lista de Visitas -->
+      <div class="card card-info mb-3">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fa fa-table"></i> LISTA DE VISITAS</h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-sm" id="txtbusqueda" name="txtbusqueda" placeholder="Ingrese aqui el nombre, entidad o cargo de la persona...">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group">
+                        <input type="hidden" id="fechabusqueda" name="fechabusqueda" value="07/10/2024 - 07/10/2024">
+                        <div class="input-group">
+                            <button type="button" class="btn btn-default float-right" id="daterange-btn">
+                                <span><i class="fa fa-calendar-alt"></i>&nbsp;&nbsp;&nbsp;07/10/2024 - 07/10/2024</span>
+                                <i class="fas fa-caret-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-info btn-xs float-left" id="btnbuscar">
+                            <i class="fa fa-search-plus"></i>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <div id="tblvisita_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                      <div class="row col-lg-12 col-md-12 col-sm-12 arriba1">
+                        <div class="dt-buttons btn-group flex-wrap">
+                          <button class="btn btn-secondary buttons-excel buttons-html5 btn-success btn-sm float-right" tabindex="0" aria-controls="tblvisita" type="button">
+                            <span><i class="fa fa-file-excel"></i>&nbsp;Excel</span>
+                          </button> 
+                        </div>
+                      </div>
+                      <div class="arriba2">
+                        <div class="dataTables_length" id="tblvisita_length">
+                          <label>Show 
+                            <select name="tblvisita_length" aria-controls="tblvisita" class="custom-select custom-select-sm form-control form-control-sm">
+                              <option value="10">10</option>
+                              <option value="25">25</option>
+                              <option value="50">50</option>
+                              <option value="-1">Todo</option>
+                            </select> entries
+                          </label>
+                        </div>
+                        <div id="tblvisita_processing" class="dataTables_processing card" style="display: none;">Processing...</div>
+                      </div>
+                      <div class="abajo">
+                        <table id="tblvisita" class="table display table-bordered table-striped dataTable no-footer" role="grid" aria-describedby="tblvisita_info">
+                          <thead class="thead-dark">
+                            <tr role="row">
+                              <th class="dt-center dt-head-center sorting_disabled" rowspan="1" colspan="1" aria-label="Accion">Accion</th>
+                              <th class="dt-center dt-head-center sorting_desc" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-sort="descending" aria-label="Nro.: activate to sort column ascending">Nro.</th>
+                              <th class="dt-center dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Fecha de visita: activate to sort column ascending">Fecha de visita</th>
+                              <th class="dt-justify dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Visitante: activate to sort column ascending">Visitante</th>
+                              <th class="dt-center dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Documento del visitante: activate to sort column ascending">Documento del visitante</th>
+                              <th class="dt-justify dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Entidad del visitante: activate to sort column ascending">Entidad del visitante</th>
+                              <th class="dt-justify dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Funcionario visitado: activate to sort column ascending">Funcionario visitado</th>
+                              <th class="dt-center dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Hora ingreso: activate to sort column ascending">Hora ingreso</th>
+                              <th class="dt-center dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Hora salida: activate to sort column ascending">Hora salida</th>
+                              <th class="dt-justify dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Motivo: activate to sort column ascending">Motivo</th>
+                              <th class="dt-justify dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Lugar especifico: activate to sort column ascending">Lugar especifico</th>
+                              <th class="dt-justify dt-head-center sorting" tabindex="0" aria-controls="tblvisita" rowspan="1" colspan="1" aria-label="Observaciones: activate to sort column ascending">Observaciones</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr class="odd"><td valign="top" colspan="12" class="dataTables_empty">No data available in table</td></tr>
+                          </tbody>
+                        </table>
+                        <div class="dataTables_info" id="tblvisita_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div>
+                        <div class="dataTables_paginate paging_simple_numbers" id="tblvisita_paginate">
+                          <ul class="pagination">
+                            <li class="paginate_button page-item previous disabled" id="tblvisita_previous">
+                              <a href="#" aria-controls="tblvisita" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
+                            </li>
+                            <li class="paginate_button page-item next disabled" id="tblvisita_next">
+                              <a href="#" aria-controls="tblvisita" data-dt-idx="1" tabindex="0" class="page-link">Next</a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
     </section>
   </div>
 
@@ -315,6 +417,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $(document).ready(function() {
     $('.select2').select2();
   });
+
+  function buscarPorDNI() {
+    const dni = document.getElementById('ndocu').value;
+    if (dni.length === 8) {  // Validar si tiene 8 dígitos
+      fetch(`https://api.apis.net.pe/v2/reniec/dni?numero=${dni}`, {
+        headers: { 'Authorization': 'Bearer apis-token-10779.deFjdQHVSuenRlLS27jpqtmQ0SJV4hfj' }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.error) {
+          document.getElementById('nombre').value = `${data.nombres} ${data.apellidoPaterno} ${data.apellidoMaterno}`;
+          // Completar otros campos si lo deseas
+        } else {
+          alert('DNI no encontrado');
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    }
+  }
 </script>
 
 </body>
