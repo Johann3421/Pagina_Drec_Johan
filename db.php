@@ -1,14 +1,14 @@
 <?php
 // db.php
-$host = 'localhost';
-$dbname = 'login_system';
-$user = 'root'; // Cambia esto si tu usuario de MySQL es diferente
-$pass = '';     // Cambia esto si tu contraseña es diferente
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "login_system";
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Error al conectar a la base de datos: " . $e->getMessage());
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Verificar la conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
 }
 ?>
