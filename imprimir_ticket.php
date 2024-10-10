@@ -1,6 +1,6 @@
 <?php
-// Cargar autoload de Composer y la clase FPDF
-require 'fpdf/fpdf.php';  // Ruta correcta de fpdf.php
+// Cargar la clase FPDF
+require 'fpdf/fpdf.php';
 
 class PDF_Dash extends FPDF
 {
@@ -14,7 +14,6 @@ class PDF_Dash extends FPDF
         $this->_out($s);
     }
 }
-
 
 // Incluir el archivo de la base de datos
 include 'db.php';  // Verifica que este archivo establezca la conexión correctamente
@@ -32,59 +31,68 @@ if ($id) {
     $row = $result->fetch_assoc();
 
     if ($row) {
-        // Crear el PDF usando la clase extendida PDF_Dash
-        $pdf = new PDF_Dash('P', 'mm', array(90, 120));  // Ticket de tamaño pequeño
+        // Crear el PDF usando la clase extendida PDF_Dash con un tamaño de ticket 90x125 mm
+        $pdf = new PDF_Dash('P', 'mm', array(90, 125));
         $pdf->AddPage();
 
-        // Fuente: Arial, Negrita, Tamaño 12
+        // Agregar una imagen al encabezado (ajustada al tamaño del ticket)
+        $pdf->Image('imagenes/logo_dre.png', 14, -15, 65, 55); // (ruta, x, y, ancho, alto)
+
+        // Fuente: Arial, Negrita, Tamaño 10
         $pdf->SetFont('Arial', 'B', 12);
 
-        // Encabezado centrado
-        $pdf->Cell(70, 10, "DIRECCION REGIONAL DE EDUCACION", 0, 1, 'C');
+        // Encabezado centrado debajo de la imagen
+        $pdf->Ln(15);  // Deja espacio debajo de la imagen
+        $pdf->Cell(0, 10, "DIRECCION REGIONAL DE EDUCACION", 0, 1, 'C');
 
         // Línea de separación
-        $pdf->Line(0, 20, 90, 20);  // Linea simple horizontal
+        $pdf->Line(10, 35, 80, 35);  // Línea simple horizontal
 
-        // Fuente: Arial, Regular, Tamaño 10
-        $pdf->SetFont('Arial', '', 10);
+        // Fuente: Arial, Regular, Tamaño 9 (más pequeño para que encaje en el ticket)
+        $pdf->SetFont('Arial', '', 9);
 
         // Fecha a la izquierda y hora a la derecha
+        $pdf->Ln(0);  // Deja un poco de espacio
         $pdf->Cell(30, 6, "Fecha: " . $row['fecha'], 0, 0, 'L');
-        $pdf->Cell(38, 6, "Hora: " . $row['hora_ingreso'], 0, 1, 'R');
+        $pdf->Cell(40, 6, "Hora: " . $row['hora_ingreso'], 0, 1, 'R');
 
         // Línea punteada de separación
         $pdf->SetDash(1, 1);  // Activar modo punteado
-        $pdf->Line(0, 26, 90, 26);  // Línea punteada horizontal
+        $pdf->Line(10, 40, 80, 40);  // Línea punteada horizontal
         $pdf->SetDash();  // Desactivar modo punteado
 
         // Texto centrado BIENVENIDO
-        $pdf->Cell(70, 10, "BIENVENIDO", 0, 1, 'C');
+        $pdf->Ln(0);  // Espacio adicional
+        $pdf->Cell(0, 10, "BIENVENIDO", 0, 1, 'C');
 
         // Datos del visitante
-        $pdf->Cell(70, 6, "Nombre: " . $row['nombre'], 0, 1, 'C');
-        $pdf->Cell(70, 6, "DNI: " . $row['dni'], 0, 1, 'C');
-        $pdf->Cell(70, 6, "Motivo: " . $row['smotivo'], 0, 1, 'C');
-        $pdf->Cell(70, 6, "Numero: " . $row['id'], 0, 1, 'C');  // Usando 'id' como número de visita
-        $pdf->Cell(70, 6, "Lugar: " . $row['lugar'], 0, 1, 'C');
+        $pdf->Ln(0);  // Espacio adicional
+        $pdf->Cell(0, 6, $row['nombre'], 0, 1, 'C');
+        $pdf->Cell(0, 6, "DNI: " . $row['dni'], 0, 1, 'C');
+        $pdf->Cell(0, 6, "Motivo: " . $row['smotivo'], 0, 1, 'C');
+        $pdf->Cell(0, 6, $row['lugar'], 0, 1, 'C');
 
         // Línea punteada de separación
         $pdf->SetDash(1, 1);
-        $pdf->Line(0, 67, 90, 67);  // Línea punteada horizontal
+        $pdf->Line(10, 78, 80, 78);  // Línea punteada horizontal
         $pdf->SetDash();
 
         // Mensaje de agradecimiento
-        $pdf->Cell(70, 10, "GRACIAS POR SU VISITA", 0, 1, 'C');
+        $pdf->Ln(0);  // Espacio antes del mensaje
+        $pdf->Cell(0, 10, "GRACIAS POR SU VISITA", 0, 1, 'C');
 
         // Mensaje en quechua
-        $pdf->Cell(70, 6, "DIOSPAGRAUQUI", 0, 1, 'C');
+        $pdf->Ln(-2);  // Espacio adicional
+        $pdf->Cell(0, 6, "SHAMUSHQAYKITA PAKILLA", 0, 1, 'C');
 
         // Línea punteada de separación
         $pdf->SetDash(1, 1);
-        $pdf->Line(0, 83, 90, 83);  // Línea punteada horizontal
+        $pdf->Line(10, 88, 80, 88);  // Línea punteada horizontal
         $pdf->SetDash();
 
         // Pie de página
-        $pdf->Cell(70, 10, "www.drehuanuco.gob.pe", 0, 1, 'C');
+        $pdf->Ln(-2.5);  // Espacio adicional
+        $pdf->Cell(0, 10, "www.drehuanuco.gob.pe", 0, 1, 'C');
 
         // Generar el PDF
         $pdf->Output();
