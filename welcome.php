@@ -9,7 +9,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar la conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+  die("Conexión fallida: " . $conn->connect_error);
 }
 
 // Consulta para obtener solo las visitas sin salida registrada
@@ -181,6 +181,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   <a href="#" class="nav-link">
                     <i class="material-icons">visibility</i>
                     <p>Vista para exterior</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="Cronometro_Trabajadores/Cronometro_welcome.php" class="nav-link">
+                    <i class="material-icons">access_time</i>
+                    <p>Cronometro</p>
                   </a>
                 </li>
               </ul>
@@ -555,27 +561,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Registrar salida y ocultar la fila después de registrar
     // Registrar salida y ocultar la fila después de registrar
-function registrarSalida(id) {
-    // Realizar una solicitud AJAX para actualizar los datos
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "registrar_salida.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    function registrarSalida(id) {
+      // Realizar una solicitud AJAX para actualizar los datos
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "registrar_salida.php", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            if (xhr.responseText.includes("Salida registrada correctamente.")) {
-                alert("Salida registrada correctamente.");
+          if (xhr.responseText.includes("Salida registrada correctamente.")) {
+            alert("Salida registrada correctamente.");
 
-                // Ocultar la fila después de registrar la salida
-                document.getElementById("fila_" + id).style.display = "none";
-            } else {
-                alert("Error al registrar la salida: " + xhr.responseText);
-            }
+            // Ocultar la fila después de registrar la salida
+            document.getElementById("fila_" + id).style.display = "none";
+          } else {
+            alert("Error al registrar la salida: " + xhr.responseText);
+          }
         }
-    };
+      };
 
-    xhr.send("id=" + id);  // Solo enviamos el ID
-}
+      xhr.send("id=" + id); // Solo enviamos el ID
+    }
 
 
 
