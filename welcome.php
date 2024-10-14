@@ -1,4 +1,9 @@
 <?php
+// Configuración de la base de datos y paginación
+$limite = 10;  // Número de registros por página
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$offset = ($pagina - 1) * $limite;
+
 // Conexión a la base de datos
 $servername = "localhost";
 $username = "root";
@@ -9,14 +14,23 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar la conexión
 if ($conn->connect_error) {
-  die("Conexión fallida: " . $conn->connect_error);
+    die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Consulta para obtener solo las visitas sin salida registrada
-$sql = "SELECT * FROM visitas WHERE hora_salida IS NULL";
-$result = $conn->query($sql);
+// Obtener el número total de registros que tienen hora_salida vacía
+$sql_total = "SELECT COUNT(*) as total FROM visitas WHERE hora_salida IS NULL OR hora_salida = ''";
+$result_total = $conn->query($sql_total);
+$total_filas = $result_total->fetch_assoc()['total'];
 
-// Resto del código para mostrar la tabla...
+// Calcular el número total de páginas
+$total_paginas = ceil($total_filas / $limite);
+
+// Obtener los registros para la página actual filtrando por hora_salida vacía
+$sql = "SELECT * FROM visitas WHERE hora_salida IS NULL OR hora_salida = '' LIMIT ? OFFSET ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('ii', $limite, $offset);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 
@@ -172,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="#" class="nav-link">
+                  <a href="reporte.php" class="nav-link">
                     <i class="material-icons">assessment</i>
                     <p>Reporte</p>
                   </a>
@@ -305,13 +319,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="col-lg-12 col-md-12 col-sm-12">
                           <div class="form-group">
                             <label for="nomoficina">Oficina:</label>
-                            <input type="hidden" id="oficodigo" name="oficodigo" value="561">
-                            <input type="hidden" id="iddireccionesweb" name="iddireccionesweb" value="3">
-                            <input type="hidden" id="nomoficinai" name="nomoficina" value="DRE/SERVICIOS GENERALES">
-                            <select id="nomoficina" class="form-control select2 form-control-sm">
-                              <option selected="" value="0">&lt;&lt; SELECCIONE &gt;&gt;</option>
-                              <option value="DRE/SERVICIOS GENERALES" selected="">DRE/SERVICIOS GENERALES</option>
+                            <select id="nomoficina" class="form-control select2 form-control-sm" onchange="updateLugarByOficina()">
+                              <option value="SELECCIONE" selected>&lt;&lt; SELECCIONE &gt;&gt;</option> <!-- Solo esta opción tiene selected -->
                               <!-- Más opciones aquí -->
+                              
+                              <option value="ABASTECIMIENTO" data-id="558" data-select2-id="29">ABASTECIMIENTO</option>
+                              <option value="ALMACEN" data-id="559" data-select2-id="30">ALMACEN</option>
+                              <option value="ARCHIVO" data-id="554" data-select2-id="31">ARCHIVO</option>
+                              <option value="BIENESTAR SOCIAL" data-id="564" data-select2-id="32">BIENESTAR SOCIAL</option>
+                              <option value="CONTABILIDAD" data-id="563" data-select2-id="33">CONTABILIDAD</option>
+                              <option value="DIRECCIÓN DE GESTIÓN ADMINISTRATIVA" data-id="170" data-select2-id="34">DIRECCIÓN DE GESTIÓN ADMINISTRATIVA</option>
+                              <option value="DIRECCIÓN DE GESTIÓN INSTITUCIONAL" data-id="168" data-select2-id="35">DIRECCIÓN DE GESTIÓN INSTITUCIONAL</option>
+                              <option value="DIRECCIÓN DE GESTIÓN PEDAGÓGICA" data-id="167" data-select2-id="36">DIRECCIÓN DE GESTIÓN PEDAGÓGICA</option>
+                              <option value="DIRECCIÓN REGIONAL DE EDUCACIÓN-TRAMITE DOCUMENTARIO" data-id="197" data-select2-id="28">DIRECCIÓN REGIONAL DE EDUCACIÓN-TRAMITE DOCUMENTARIO</option>
+                              <option value="DIRECCIÓN REGIONAL" data-id="166" data-select2-id="37">DIRECCIÓN REGIONAL</option>
+                              <option value="ESCALAFON" data-id="556" data-select2-id="38">ESCALAFON</option>
+                              <option value="ESTADÍSTICA" data-id="566" data-select2-id="39">ESTADÍSTICA</option>
+                              <option value="INFORMÁTICA" data-id="567" data-select2-id="40">INFORMÁTICA</option>
+                              <option value="INFRAESTRUCTURA" data-id="568" data-select2-id="41">INFRAESTRUCTURA</option>
+                              <option value="OFICINA DE ASESORÍA JURÍDICA" data-id="169" data-select2-id="42">OFICINA DE ASESORÍA JURÍDICA</option>
+                              <option value="OFICINA DE CONTROL INSTITUCIONAL" data-id="171" data-select2-id="43">OFICINA DE CONTROL INSTITUCIONAL</option>
+                              <option value="PATRIMONIO" data-id="560" data-select2-id="44">PATRIMONIO</option>
+                              <option value="PERSONAL" data-id="555" data-select2-id="45">PERSONAL</option>
+                              <option value="PLANIFICACIÓN" data-id="570" data-select2-id="46">PLANIFICACIÓN</option>
+                              <option value="PLANILLAS" data-id="557" data-select2-id="47">PLANILLAS</option>
+                              <option value="PRESUPUESTO" data-id="571" data-select2-id="48">PRESUPUESTO</option>
+                              <option value="PROYECTOS" data-id="572" data-select2-id="49">PROYECTOS</option>
+                              <option value="RACIONALIZACIÓN" data-id="565" data-select2-id="50">RACIONALIZACIÓN</option>
+                              <option value="RELACIONES PUBLICAS" data-id="1898" data-select2-id="51">RELACIONES PUBLICAS</option>
+                              <option value="SECRETARIA GENERAL" data-id="553" data-select2-id="52">SECRETARIA GENERAL</option>
+                              <option value="SECRETARIA TECNICA" data-id="2480" data-select2-id="53">SECRETARIA TECNICA</option>
+                              <option value="SERVICIOS GENERALES" data-id="561" data-select2-id="2">SERVICIOS GENERALES</option>
+                              <option value="SIAGIE" data-id="569" data-select2-id="54">SIAGIE</option>
+                              <option value="TESORERÍA" data-id="562" data-select2-id="55">TESORERÍA</option>
                             </select>
                             <div id="iddireccionesweb_error" class="text-danger" style="font-size: 12px;"></div>
                             <div id="oficodigo_error" class="text-danger" style="font-size: 12px;"></div>
@@ -321,23 +361,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="col-lg-12 col-md-12 col-sm-12">
 
                           <div class="form-group">
-                            <label for="smotivo">Motivo de visita :</label>
-                            <select id="smotivo" name="smotivo" class="form-control form-control-sm">
-                              <option value="0">&lt;&lt; SELECCIONE &gt;&gt;</option>
-                              <option value="Reunion de trabajo">Reunión de trabajo</option>
-                              <!-- Más opciones aquí -->
-                            </select>
+                            <label for="smotivo">Motivo de visita:</label>
+
+                            <!-- Botones en lugar de select -->
+                            <div id="motivo-buttons" class="btn-group" role="group">
+                              <button type="button" class="btn btn-outline-primary" onclick="selectMotivo(this, 'Reunion de trabajo')">Reunión de trabajo</button>
+                              <button type="button" class="btn btn-outline-primary" onclick="selectMotivo(this, 'Provision de servicios')">Provisión de servicios</button>
+                              <button type="button" class="btn btn-outline-primary" onclick="selectMotivo(this, 'Gestion de intereses')">Gestión de intereses</button>
+                              <button type="button" class="btn btn-outline-primary" onclick="selectMotivo(this, 'Motivo personal')">Motivo personal</button>
+                              <button type="button" class="btn btn-outline-primary" onclick="selectMotivo(this, 'Tramite documentario')">Trámite documentario</button>
+                              <button type="button" class="btn btn-outline-primary" onclick="selectMotivo(this, 'Otros')">Otros</button>
+                            </div>
+
+                            <!-- Campo oculto para almacenar el valor seleccionado -->
+                            <input type="hidden" id="smotivo" name="smotivo" value="">
+
+                            <!-- Div para mostrar errores -->
                             <div id="motivo_error" class="text-danger" style="font-size: 12px;"></div>
-                          </div>
-                          <div id="fgmotivo" class="form-group" style="display: none;">
-                            <label for="motivo">Especifique motivo :</label>
-                            <input type="text" id="motivo" class="form-control form-control-sm" name="motivo" onkeyup="convertToUppercase(this)" placeholder="Ejemp. Asunto Personal">
                           </div>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12">
                           <div class="form-group">
-                            <label for="lugar">Lugar :</label>
-                            <input type="text" class="form-control form-control-sm" id="lugar" name="lugar" onkeyup="convertToUppercase(this)" placeholder="Ejemp. Edificio A - Piso 2">
+                            <label for="lugar">Lugar:</label>
+                            <input type="text" class="form-control form-control-sm" id="lugar" name="lugar" placeholder="ID de la Oficina">
                             <div id="lugar_error" class="text-danger" style="font-size: 12px;"></div>
                           </div>
                         </div>
@@ -418,8 +464,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           <th>Nro.</th>
                           <th>Fecha de visita</th>
                           <th>Visitante</th>
-                          <th>Documento del visitante</th>
                           <th>Entidad del visitante</th>
+                          <th>Documento del visitante</th>
                           <th>Hora Ingreso</th>
                           <th>Hora Salida</th>
                           <th>Motivo</th>
@@ -431,48 +477,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       <tbody>
                         <?php
                         if ($result->num_rows > 0) {
-                          $nro = 1;
+                          $nro = $offset + 1;  // Ajustar numeración para paginación
                           while ($row = $result->fetch_assoc()) {
-                            // Añadir identificador único para cada fila
                             echo "<tr id='fila_{$row['id']}'>";
-
-                            // Botón de acción para registrar salida
-                            echo "<td>
-            <button class='btn btn-primary' onclick='registrarSalida({$row['id']})'>Registrar Salida</button>
-          </td>";
-
+                            echo "<td><button class='btn btn-primary' onclick='registrarSalida({$row['id']})'>Registrar Salida</button></td>";
                             echo "<td>" . $nro++ . "</td>";
                             echo "<td>" . $row['fecha'] . "</td>";
                             echo "<td>" . $row['nombre'] . "</td>";
+                            echo "<td>" . $row['tipopersona'] . "</td>";
                             echo "<td>" . $row['dni'] . "</td>";
-                            echo "<td>" . $row['nomoficina'] . "</td>";
-
-                            // Verificamos si hora_ingreso existe
                             echo "<td>" . (isset($row['hora_ingreso']) ? $row['hora_ingreso'] : 'N/A') . "</td>";
-
-                            // Verificamos si hora_salida existe
                             echo "<td>" . (isset($row['hora_salida']) ? $row['hora_salida'] : 'N/A') . "</td>";
-
                             echo "<td>" . $row['smotivo'] . "</td>";
                             echo "<td>" . $row['lugar'] . "</td>";
-
-                            // Observación vacía (se puede omitir si no se necesita)
                             echo "<td>" . (isset($row['observaciones']) ? $row['observaciones'] : 'N/A') . "</td>";
-
-                            echo "<td>
-            <button class='btn btn-success' onclick='imprimirTicket({$row['id']})'>Imprimir Ticket</button>
-          </td>";
-
+                            echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'>Imprimir Ticket</button></td>";
                             echo "</tr>";
                           }
                         } else {
                           echo "<tr><td colspan='12'>No hay datos disponibles</td></tr>";
                         }
-
-                        $conn->close();
                         ?>
                       </tbody>
                     </table>
+                  </div>
+                  <div class="dataTables_paginate paging_simple_numbers" id="tblvisita_paginate">
+                    <ul class="pagination">
+                      <?php if ($pagina > 1): ?>
+                        <li class="paginate_button page-item previous">
+                          <a href="?pagina=<?= $pagina - 1 ?>" class="page-link">Previous</a>
+                        </li>
+                      <?php else: ?>
+                        <li class="paginate_button page-item previous disabled">
+                          <a href="#" class="page-link">Previous</a>
+                        </li>
+                      <?php endif; ?>
+
+                      <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                        <li class="paginate_button page-item <?= ($i == $pagina) ? 'active' : '' ?>">
+                          <a href="?pagina=<?= $i ?>" class="page-link"><?= $i ?></a>
+                        </li>
+                      <?php endfor; ?>
+
+                      <?php if ($pagina < $total_paginas): ?>
+                        <li class="paginate_button page-item next">
+                          <a href="?pagina=<?= $pagina + 1 ?>" class="page-link">Next</a>
+                        </li>
+                      <?php else: ?>
+                        <li class="paginate_button page-item next disabled">
+                          <a href="#" class="page-link">Next</a>
+                        </li>
+                      <?php endif; ?>
+                    </ul>
                   </div>
 
                   <div class="clear"></div>
@@ -586,7 +642,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
     function imprimirTicket(id) {
-      window.location.href = "imprimir_ticket.php?id=" + id;
+      // Crea un iframe invisible para cargar el PDF
+      let iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = "imprimir_ticket.php?id=" + id; // Ruta a tu archivo PHP que genera el PDF
+      document.body.appendChild(iframe);
+
+      // Espera a que el PDF se cargue en el iframe, luego imprime directamente
+      iframe.onload = function() {
+        iframe.contentWindow.print();
+      };
+    }
+
+    function selectMotivo(button, value) {
+      // Remover el estilo seleccionado de todos los botones
+      const buttons = document.querySelectorAll('#motivo-buttons .btn');
+      buttons.forEach(btn => btn.classList.remove('btn-primary'));
+      buttons.forEach(btn => btn.classList.add('btn-outline-primary'));
+
+      // Aplicar estilo seleccionado al botón clicado
+      button.classList.remove('btn-outline-primary');
+      button.classList.add('btn-primary');
+
+      // Almacenar el valor en el campo oculto
+      document.getElementById('smotivo').value = value;
+    }
+
+    function updateLugarByOficina() {
+      // Obtener el elemento select
+      var select = document.getElementById('nomoficina');
+
+      // Obtener el texto de la opción seleccionada (el nombre de la oficina)
+      var selectedText = select.options[select.selectedIndex].text;
+
+      // Autocompletar el campo lugar con el texto de la oficina seleccionada
+      document.getElementById('lugar').value = selectedText;
     }
   </script>
 

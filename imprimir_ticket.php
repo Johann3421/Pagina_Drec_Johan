@@ -94,11 +94,11 @@ if ($id) {
         $pdf->Ln(-2.5);  // Espacio adicional
         $pdf->Cell(0, 10, "www.drehuanuco.gob.pe", 0, 1, 'C');
 
-        // Generar el PDF
-        $pdf->Output();
+        // Generar el PDF y devolverlo como respuesta
+        $pdf->Output('I', 'ticket.pdf'); // 'I' muestra el archivo en línea en el navegador, 'ticket.pdf' es el nombre del archivo
+
     }
 
     $stmt->close();
 }
 $conn->close();
-?>
