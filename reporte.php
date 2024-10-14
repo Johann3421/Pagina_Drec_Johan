@@ -204,7 +204,7 @@ $result = $stmt->get_result();
                             echo "<td>" . $row['smotivo'] . "</td>";
                             echo "<td>" . $row['lugar'] . "</td>";
                             echo "<td>" . (isset($row['observaciones']) ? $row['observaciones'] : 'N/A') . "</td>";
-                            echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'>Imprimir Ticket</button></td>";
+                            echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'><i class='material-icons'>print</i></button></td>";
                             echo "</tr>";
                           }
                         } else {

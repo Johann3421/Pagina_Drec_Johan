@@ -326,8 +326,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                               <option value="ABASTECIMIENTO" data-id="558" data-select2-id="29">ABASTECIMIENTO</option>
                               <option value="ALMACEN" data-id="559" data-select2-id="30">ALMACEN</option>
                               <option value="ARCHIVO" data-id="554" data-select2-id="31">ARCHIVO</option>
+                              <option value="AUDITORIO PRINCIPAL" data-id="602" data-select2-id="60">AUDITORIO PRINCIPAL</option>
                               <option value="BIENESTAR SOCIAL" data-id="564" data-select2-id="32">BIENESTAR SOCIAL</option>
                               <option value="CONTABILIDAD" data-id="563" data-select2-id="33">CONTABILIDAD</option>
+                              <option value="CONSTANCIA DE PAGO" data-id="580" data-select2-id="57">CONSTANCIA DE PAGO</option>
+                              <option value="DIRECCION DE ASESORIA JURIDICA"data-id="564" data-select2-id="56">DIRECCION DE ASESORIA JURIDICA</option>
                               <option value="DIRECCIÓN DE GESTIÓN ADMINISTRATIVA" data-id="170" data-select2-id="34">DIRECCIÓN DE GESTIÓN ADMINISTRATIVA</option>
                               <option value="DIRECCIÓN DE GESTIÓN INSTITUCIONAL" data-id="168" data-select2-id="35">DIRECCIÓN DE GESTIÓN INSTITUCIONAL</option>
                               <option value="DIRECCIÓN DE GESTIÓN PEDAGÓGICA" data-id="167" data-select2-id="36">DIRECCIÓN DE GESTIÓN PEDAGÓGICA</option>
@@ -343,6 +346,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                               <option value="PERSONAL" data-id="555" data-select2-id="45">PERSONAL</option>
                               <option value="PLANIFICACIÓN" data-id="570" data-select2-id="46">PLANIFICACIÓN</option>
                               <option value="PLANILLAS" data-id="557" data-select2-id="47">PLANILLAS</option>
+                              <option value="PP 051 - PTCD" data-id="600" data-select2-id="58">PP 051 - PTCD</option>
+                              <option value="PP 068 - PREVAED" data-id="601" data-select2-id="59">PP 068 - PREVAED</option>
                               <option value="PRESUPUESTO" data-id="571" data-select2-id="48">PRESUPUESTO</option>
                               <option value="PROYECTOS" data-id="572" data-select2-id="49">PROYECTOS</option>
                               <option value="RACIONALIZACIÓN" data-id="565" data-select2-id="50">RACIONALIZACIÓN</option>
@@ -350,7 +355,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                               <option value="SECRETARIA GENERAL" data-id="553" data-select2-id="52">SECRETARIA GENERAL</option>
                               <option value="SECRETARIA TECNICA" data-id="2480" data-select2-id="53">SECRETARIA TECNICA</option>
                               <option value="SERVICIOS GENERALES" data-id="561" data-select2-id="2">SERVICIOS GENERALES</option>
-                              <option value="SIAGIE" data-id="569" data-select2-id="54">SIAGIE</option>
                               <option value="TESORERÍA" data-id="562" data-select2-id="55">TESORERÍA</option>
                             </select>
                             <div id="iddireccionesweb_error" class="text-danger" style="font-size: 12px;"></div>
@@ -480,7 +484,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           $nro = $offset + 1;  // Ajustar numeración para paginación
                           while ($row = $result->fetch_assoc()) {
                             echo "<tr id='fila_{$row['id']}'>";
-                            echo "<td><button class='btn btn-primary' onclick='registrarSalida({$row['id']})'>Registrar Salida</button></td>";
+                            echo "<td><button class='btn btn-primary' onclick='registrarSalida({$row['id']})'><i class='material-icons'>exit_to_app</i></button></td>";
                             echo "<td>" . $nro++ . "</td>";
                             echo "<td>" . $row['fecha'] . "</td>";
                             echo "<td>" . $row['nombre'] . "</td>";
@@ -491,7 +495,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo "<td>" . $row['smotivo'] . "</td>";
                             echo "<td>" . $row['lugar'] . "</td>";
                             echo "<td>" . (isset($row['observaciones']) ? $row['observaciones'] : 'N/A') . "</td>";
-                            echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'>Imprimir Ticket</button></td>";
+                            echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'><i class='material-icons'>print</i></button></td>";
                             echo "</tr>";
                           }
                         } else {

@@ -69,8 +69,9 @@ if ($id) {
         $pdf->Ln(0);  // Espacio adicional
         $pdf->Cell(0, 6, $row['nombre'], 0, 1, 'C');
         $pdf->Cell(0, 6, "DNI: " . $row['dni'], 0, 1, 'C');
-        $pdf->Cell(0, 6, "Motivo: " . $row['smotivo'], 0, 1, 'C');
         $pdf->Cell(0, 6, $row['lugar'], 0, 1, 'C');
+        $pdf->Cell(0, 6, "Motivo: " . $row['smotivo'], 0, 1, 'C');
+        
 
         // Línea punteada de separación
         $pdf->SetDash(1, 1);
