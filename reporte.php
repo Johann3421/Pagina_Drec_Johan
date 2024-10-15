@@ -1,9 +1,4 @@
 <?php
-// Configuración de la base de datos y paginación
-$limite = 10;  // Número de registros por página
-$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-$offset = ($pagina - 1) * $limite;
-
 // Conexión a la base de datos
 $servername = "localhost";
 $username = "root";
@@ -14,33 +9,44 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar la conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+  die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Obtener el número total de registros
-$sql_total = "SELECT COUNT(*) as total FROM visitas";
-$result_total = $conn->query($sql_total);
+// Parámetros de búsqueda
+$busqueda = isset($_GET['busqueda']) ? $_GET['busqueda'] : '';
+
+// Configuración de la paginación
+$limite = 10; // Número de registros por página
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$offset = ($pagina - 1) * $limite;
+
+// Consulta de búsqueda
+$sql_busqueda = "SELECT * FROM visitas WHERE nombre LIKE ? OR dni LIKE ? OR smotivo LIKE ? OR lugar LIKE ? LIMIT ? OFFSET ?";
+$stmt = $conn->prepare($sql_busqueda);
+$busqueda_param = '%' . $busqueda . '%';
+$stmt->bind_param('ssssii', $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param, $limite, $offset);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Contar total de registros (sin paginación)
+$sql_total = "SELECT COUNT(*) as total FROM visitas WHERE nombre LIKE ? OR dni LIKE ? OR smotivo LIKE ? OR lugar LIKE ?";
+$stmt_total = $conn->prepare($sql_total);
+$stmt_total->bind_param('ssss', $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param);
+$stmt_total->execute();
+$result_total = $stmt_total->get_result();
 $total_filas = $result_total->fetch_assoc()['total'];
 
 // Calcular el número total de páginas
 $total_paginas = ceil($total_filas / $limite);
-
-// Obtener los registros para la página actual
-$sql = "SELECT * FROM visitas LIMIT ? OFFSET ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param('ii', $limite, $offset);
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
 <!DOCTYPE html>
-<html lang="es" style="height: auto;">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="csrf-token" content="AwHz0tWjMBpWFfS0XyLgAQhEw3dNiztPFnaACgCt">
-  <title>Portalweb | Registro Visitas</title>
-
+  <title>Reporte</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
   <link rel="icon" type="image/png" href="https://gestionportales.regionhuanuco.gob.pe/dist/img/favicon.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/fontawesome-free/css/all.min.css">
@@ -65,8 +71,9 @@ $result = $stmt->get_result();
       color: white;
     }
   </style>
-  </head>
-  <body class="hold-transition sidebar-mini layout-fixed">
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -102,53 +109,38 @@ $result = $stmt->get_result();
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-
             <!-- Principal -->
             <li class="nav-item">
               <a href="#" class="nav-link">
                 <i class="material-icons">home</i>
-                <p>
-                  Principal
-                  <span class="right badge badge-danger">New</span>
-                </p>
+                <p>Principal</p>
               </a>
             </li>
 
             <!-- Registro de visitas -->
-            <li class="nav-item has-treeview">
-              <a href="#" class="nav-link">
-                <i class="material-icons">event</i>
-                <p>
-                  Registro de visitas
-                  <i class="material-icons right">expand_more</i>
-                </p>
+            <li class="nav-item">
+              <a href="welcome.php" class="nav-link">
+                <i class="material-icons">person_add</i>
+                <p>Registrar visitas</p>
               </a>
-              <ul class="nav nav-treeview" style="display: none;">
-                <li class="nav-item">
-                  <a href="welcome.php" class="nav-link">
-                    <i class="material-icons">person_add</i>
-                    <p>Registrar visitas</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="reporte.php" class="nav-link">
-                    <i class="material-icons">assessment</i>
-                    <p>Reporte</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="#" class="nav-link">
-                    <i class="material-icons">visibility</i>
-                    <p>Vista para exterior</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="Cronometro_Trabajadores/Cronometro_welcome.php" class="nav-link">
-                    <i class="material-icons">access_time</i>
-                    <p>Cronometro</p>
-                  </a>
-                </li>
-              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="reporte.php" class="nav-link">
+                <i class="material-icons">assessment</i>
+                <p>Reporte</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="material-icons">visibility</i>
+                <p>Vista para exterior</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Cronometro_Trabajadores/Cronometro_welcome.php" class="nav-link">
+                <i class="material-icons">access_time</i>
+                <p>Cronometro</p>
+              </a>
             </li>
           </ul>
         </nav>
@@ -170,84 +162,92 @@ $result = $stmt->get_result();
     </script>
 
     <div class="content-wrapper" style="min-height: 678.031px;">
+      <div class="container-fluid my-4">
+        <h1>Reporte de Salidas</h1>
 
-                  <div class="abajo">
-                    <table id="tblvisita" class="table display table-bordered table-striped dataTable no-footer" role="grid">
-                      <thead class="thead-dark">
-                        <tr role="row">
-                          <th>Nro.</th>
-                          <th>Fecha de visita</th>
-                          <th>Visitante</th>
-                          <th>Entidad del visitante</th>
-                          <th>Documento del visitante</th>
-                          <th>Hora Ingreso</th>
-                          <th>Hora Salida</th>
-                          <th>Motivo</th>
-                          <th>Lugar Especifico</th>
-                          <th>Observaciones</th>
-                          <th>Imprimir Ticket</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <?php
-                        if ($result->num_rows > 0) {
-                          $nro = $offset + 1;  // Ajustar numeración para paginación
-                          while ($row = $result->fetch_assoc()) {
-                            echo "<tr id='fila_{$row['id']}'>";
-                            echo "<td>" . $nro++ . "</td>";
-                            echo "<td>" . $row['fecha'] . "</td>";
-                            echo "<td>" . $row['nombre'] . "</td>";
-                            echo "<td>" . $row['tipopersona'] . "</td>";
-                            echo "<td>" . $row['dni'] . "</td>";
-                            echo "<td>" . (isset($row['hora_ingreso']) ? $row['hora_ingreso'] : 'N/A') . "</td>";
-                            echo "<td>" . (isset($row['hora_salida']) ? $row['hora_salida'] : 'N/A') . "</td>";
-                            echo "<td>" . $row['smotivo'] . "</td>";
-                            echo "<td>" . $row['lugar'] . "</td>";
-                            echo "<td>" . (isset($row['observaciones']) ? $row['observaciones'] : 'N/A') . "</td>";
-                            echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'><i class='material-icons'>print</i></button></td>";
-                            echo "</tr>";
-                          }
-                        } else {
-                          echo "<tr><td colspan='12'>No hay datos disponibles</td></tr>";
-                        }
-                        ?>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="dataTables_paginate paging_simple_numbers" id="tblvisita_paginate">
-                    <ul class="pagination">
-                      <?php if ($pagina > 1): ?>
-                        <li class="paginate_button page-item previous">
-                          <a href="?pagina=<?= $pagina - 1 ?>" class="page-link">Previous</a>
-                        </li>
-                      <?php else: ?>
-                        <li class="paginate_button page-item previous disabled">
-                          <a href="#" class="page-link">Previous</a>
-                        </li>
-                      <?php endif; ?>
+        <!-- Botón para exportar a Excel -->
+        <div class="mb-3">
+          <a href="exportar_excel.php" class="btn btn-success">Exportar a Excel</a>
+        </div>
 
-                      <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
-                        <li class="paginate_button page-item <?= ($i == $pagina) ? 'active' : '' ?>">
-                          <a href="?pagina=<?= $i ?>" class="page-link"><?= $i ?></a>
-                        </li>
-                      <?php endfor; ?>
+        <!-- Formulario de búsqueda -->
+        <form method="get" action="" class="mb-3">
+          <div class="input-group">
+            <input type="text" name="busqueda" class="form-control" placeholder="Buscar por nombre, DNI, motivo o lugar" value="<?= htmlspecialchars($busqueda) ?>">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+          </div>
+        </form>
 
-                      <?php if ($pagina < $total_paginas): ?>
-                        <li class="paginate_button page-item next">
-                          <a href="?pagina=<?= $pagina + 1 ?>" class="page-link">Next</a>
-                        </li>
-                      <?php else: ?>
-                        <li class="paginate_button page-item next disabled">
-                          <a href="#" class="page-link">Next</a>
-                        </li>
-                      <?php endif; ?>
-                    </ul>
-                  </div>
+        <!-- Tabla de visitas -->
+        <table class="table table-bordered table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th>Nro.</th>
+              <th>Fecha de visita</th>
+              <th>Visitante</th>
+              <th>Documento del visitante</th>
+              <th>Hora Ingreso</th>
+              <th>Hora Salida</th>
+              <th>Motivo</th>
+              <th>Lugar Específico</th>
+              <th>Imprimir Ticket</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            if ($result->num_rows > 0) {
+              $nro = $offset + 1;
+              while ($row = $result->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . $nro++ . "</td>";
+                echo "<td>" . $row['fecha'] . "</td>";
+                echo "<td>" . $row['nombre'] . "</td>";
+                echo "<td>" . $row['dni'] . "</td>";
+                echo "<td>" . $row['hora_ingreso'] . "</td>";
+                echo "<td>" . $row['hora_salida'] . "</td>";
+                echo "<td>" . $row['smotivo'] . "</td>";
+                echo "<td>" . $row['lugar'] . "</td>";
+                echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'><i class='material-icons'>print</i></button></td>";
+                echo "</tr>";
+              }
+            } else {
+              echo "<tr><td colspan='9'>No se encontraron resultados.</td></tr>";
+            }
+            ?>
+          </tbody>
+        </table>
 
-                  <div class="clear"></div>
-                </div>
-              </div>
-            </div>
-                  </body>
+        <!-- Paginación -->
+        <nav>
+          <ul class="pagination">
+            <?php if ($pagina > 1): ?>
+              <li class="page-item">
+                <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&busqueda=<?= htmlspecialchars($busqueda) ?>">Anterior</a>
+              </li>
+            <?php endif; ?>
+            <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+              <li class="page-item <?= ($i == $pagina) ? 'active' : '' ?>">
+                <a class="page-link" href="?pagina=<?= $i ?>&busqueda=<?= htmlspecialchars($busqueda) ?>"><?= $i ?></a>
+              </li>
+            <?php endfor; ?>
+            <?php if ($pagina < $total_paginas): ?>
+              <li class="page-item">
+                <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&busqueda=<?= htmlspecialchars($busqueda) ?>">Siguiente</a>
+              </li>
+            <?php endif; ?>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <script>
+      function imprimirTicket(id) {
+        window.location.href = "imprimir_ticket.php?id=" + id;
+      }
+    </script>
+</body>
 
 </html>
+<?php
+$conn->close();
+?>

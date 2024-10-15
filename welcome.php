@@ -17,21 +17,66 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Obtener el número total de registros que tienen hora_salida vacía
-$sql_total = "SELECT COUNT(*) as total FROM visitas WHERE hora_salida IS NULL OR hora_salida = ''";
-$result_total = $conn->query($sql_total);
+// Parámetro de filtro por fecha (si existe)
+$fecha = isset($_GET['fecha']) ? $_GET['fecha'] : '';
+
+// Parámetro de búsqueda (si existe)
+$busqueda = isset($_GET['busqueda']) ? $_GET['busqueda'] : '';
+
+// Consulta base para registros sin hora de salida
+$sql = "SELECT * FROM visitas WHERE (hora_salida IS NULL OR hora_salida = '')";
+
+// Si hay un parámetro de fecha, agregamos el filtro por fecha
+if (!empty($fecha)) {
+    $sql .= " AND fecha = ?";
+}
+
+// Si hay búsqueda, agregarla a la consulta
+if (!empty($busqueda)) {
+    $sql .= " AND (nombre LIKE ? OR dni LIKE ? OR smotivo LIKE ? OR lugar LIKE ?)";
+}
+
+// Agregamos la paginación
+$sql .= " LIMIT ? OFFSET ?";
+
+// Preparar la consulta
+$stmt = $conn->prepare($sql);
+
+// Si hay fecha y búsqueda, los incluimos en los parámetros
+if (!empty($fecha) && !empty($busqueda)) {
+    $busqueda_param = '%' . $busqueda . '%';
+    $stmt->bind_param('sssssii', $fecha, $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param, $limite, $offset);
+} elseif (!empty($fecha)) {
+    $stmt->bind_param('sii', $fecha, $limite, $offset);
+} elseif (!empty($busqueda)) {
+    $busqueda_param = '%' . $busqueda . '%';
+    $stmt->bind_param('ssssii', $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param, $limite, $offset);
+} else {
+    $stmt->bind_param('ii', $limite, $offset);
+}
+
+// Ejecutar la consulta
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Obtener el número total de registros que tienen hora_salida vacía (para paginación)
+$sql_total = "SELECT COUNT(*) as total FROM visitas WHERE (hora_salida IS NULL OR hora_salida = '')";
+if (!empty($fecha)) {
+    $sql_total .= " AND fecha = ?";
+}
+
+$stmt_total = $conn->prepare($sql_total);
+if (!empty($fecha)) {
+    $stmt_total->bind_param('s', $fecha);
+}
+$stmt_total->execute();
+$result_total = $stmt_total->get_result();
 $total_filas = $result_total->fetch_assoc()['total'];
 
 // Calcular el número total de páginas
 $total_paginas = ceil($total_filas / $limite);
-
-// Obtener los registros para la página actual filtrando por hora_salida vacía
-$sql = "SELECT * FROM visitas WHERE hora_salida IS NULL OR hora_salida = '' LIMIT ? OFFSET ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param('ii', $limite, $offset);
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
+
 
 
 
@@ -101,6 +146,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/dist/css/adminlte.css">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+
+
   <style>
     .arriba1 {
       float: right;
@@ -157,53 +207,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-
             <!-- Principal -->
             <li class="nav-item">
               <a href="#" class="nav-link">
                 <i class="material-icons">home</i>
-                <p>
-                  Principal
-                  <span class="right badge badge-danger">New</span>
-                </p>
+                <p>Principal</p>
               </a>
             </li>
 
             <!-- Registro de visitas -->
-            <li class="nav-item has-treeview">
-              <a href="#" class="nav-link">
-                <i class="material-icons">event</i>
-                <p>
-                  Registro de visitas
-                  <i class="material-icons right">expand_more</i>
-                </p>
+            <li class="nav-item">
+              <a href="welcome.php" class="nav-link">
+                <i class="material-icons">person_add</i>
+                <p>Registrar visitas</p>
               </a>
-              <ul class="nav nav-treeview" style="display: none;">
-                <li class="nav-item">
-                  <a href="#" class="nav-link">
-                    <i class="material-icons">person_add</i>
-                    <p>Registrar visitas</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="reporte.php" class="nav-link">
-                    <i class="material-icons">assessment</i>
-                    <p>Reporte</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="#" class="nav-link">
-                    <i class="material-icons">visibility</i>
-                    <p>Vista para exterior</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="Cronometro_Trabajadores/Cronometro_welcome.php" class="nav-link">
-                    <i class="material-icons">access_time</i>
-                    <p>Cronometro</p>
-                  </a>
-                </li>
-              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="reporte.php" class="nav-link">
+                <i class="material-icons">assessment</i>
+                <p>Reporte</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="material-icons">visibility</i>
+                <p>Vista para exterior</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Cronometro_Trabajadores/Cronometro_welcome.php" class="nav-link">
+                <i class="material-icons">access_time</i>
+                <p>Cronometro</p>
+              </a>
             </li>
           </ul>
         </nav>
@@ -322,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <select id="nomoficina" class="form-control select2 form-control-sm" onchange="updateLugarByOficina()">
                               <option value="SELECCIONE" selected>&lt;&lt; SELECCIONE &gt;&gt;</option> <!-- Solo esta opción tiene selected -->
                               <!-- Más opciones aquí -->
-                              
+
                               <option value="ABASTECIMIENTO" data-id="558" data-select2-id="29">ABASTECIMIENTO</option>
                               <option value="ALMACEN" data-id="559" data-select2-id="30">ALMACEN</option>
                               <option value="ARCHIVO" data-id="554" data-select2-id="31">ARCHIVO</option>
@@ -330,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                               <option value="BIENESTAR SOCIAL" data-id="564" data-select2-id="32">BIENESTAR SOCIAL</option>
                               <option value="CONTABILIDAD" data-id="563" data-select2-id="33">CONTABILIDAD</option>
                               <option value="CONSTANCIA DE PAGO" data-id="580" data-select2-id="57">CONSTANCIA DE PAGO</option>
-                              <option value="DIRECCION DE ASESORIA JURIDICA"data-id="564" data-select2-id="56">DIRECCION DE ASESORIA JURIDICA</option>
+                              <option value="DIRECCION DE ASESORIA JURIDICA" data-id="564" data-select2-id="56">DIRECCION DE ASESORIA JURIDICA</option>
                               <option value="DIRECCIÓN DE GESTIÓN ADMINISTRATIVA" data-id="170" data-select2-id="34">DIRECCIÓN DE GESTIÓN ADMINISTRATIVA</option>
                               <option value="DIRECCIÓN DE GESTIÓN INSTITUCIONAL" data-id="168" data-select2-id="35">DIRECCIÓN DE GESTIÓN INSTITUCIONAL</option>
                               <option value="DIRECCIÓN DE GESTIÓN PEDAGÓGICA" data-id="167" data-select2-id="36">DIRECCIÓN DE GESTIÓN PEDAGÓGICA</option>
@@ -412,28 +447,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <!-- /.card-header -->
           <div class="card-body">
             <div class="row">
-              <div class="col-lg-6 col-md-6 col-sm-12">
-                <div class="form-group">
-                  <input type="text" class="form-control form-control-sm" id="txtbusqueda" name="txtbusqueda" placeholder="Ingrese aqui el nombre, entidad o cargo de la persona...">
+              <form method="get" action="" class="mb-3">
+                <div class="input-group">
+                  <input type="text" name="busqueda" class="form-control" placeholder="Buscar por nombre, DNI, motivo o lugar" value="<?= htmlspecialchars($busqueda) ?>">
+                  <button type="submit" class="btn btn-primary">Buscar</button>
                 </div>
-              </div>
+              </form>
               <div class="col-lg-3 col-md-3 col-sm-12">
                 <div class="form-group">
                   <input type="hidden" id="fechabusqueda" name="fechabusqueda" value="07/10/2024 - 07/10/2024">
-                  <div class="input-group">
-                    <button type="button" class="btn btn-default float-right" id="daterange-btn">
-                      <span><i class="fa fa-calendar-alt"></i>&nbsp;&nbsp;&nbsp;07/10/2024 - 07/10/2024</span>
-                      <i class="fas fa-caret-down"></i>
-                    </button>
+                  <div class="input-group mb-3">
+                    <input type="date" id="fecha-filtro" class="form-control" placeholder="Selecciona una fecha">
+                    <span class="input-group-append">
+                      <button type="button" class="btn btn-default" id="filtrar-fecha-btn">
+                        <i class="fa fa-calendar-alt"></i> Filtrar
+                      </button>
+                    </span>
                   </div>
-                </div>
-              </div>
-              <div class="col-lg-3 col-md-3 col-sm-12">
-                <div class="form-group">
-                  <button type="button" class="btn btn-info btn-xs float-left" id="btnbuscar">
-                    <i class="fa fa-search-plus"></i>
-                    Buscar
-                  </button>
+
+
                 </div>
               </div>
             </div>
@@ -442,9 +474,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div id="tblvisita_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                   <div class="row col-lg-12 col-md-12 col-sm-12 arriba1">
                     <div class="dt-buttons btn-group flex-wrap">
-                      <button class="btn btn-secondary buttons-excel buttons-html5 btn-success btn-sm float-right" tabindex="0" aria-controls="tblvisita" type="button">
-                        <span><i class="fa fa-file-excel"></i>&nbsp;Excel</span>
-                      </button>
+                      <div class="mb-3">
+                        <a href="exportar_excel.php" class="btn btn-success">Exportar a Excel</a>
+                      </div>
                     </div>
                   </div>
                   <div class="arriba2">
@@ -620,7 +652,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Registrar salida y ocultar la fila después de registrar
-    // Registrar salida y ocultar la fila después de registrar
     function registrarSalida(id) {
       // Realizar una solicitud AJAX para actualizar los datos
       var xhr = new XMLHttpRequest();
@@ -682,6 +713,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       // Autocompletar el campo lugar con el texto de la oficina seleccionada
       document.getElementById('lugar').value = selectedText;
     }
+
+    document.getElementById('filtrar-fecha-btn').addEventListener('click', function() {
+      var fechaSeleccionada = document.getElementById('fecha-filtro').value;
+
+      if (fechaSeleccionada) {
+        // Redirigir a la misma página con el parámetro de fecha
+        window.location.href = "?fecha=" + fechaSeleccionada;
+      } else {
+        alert("Por favor, selecciona una fecha.");
+      }
+    });
   </script>
 
 
