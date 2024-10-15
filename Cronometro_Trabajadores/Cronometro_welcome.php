@@ -9,79 +9,81 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Fuente Google: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-
-    <!-- Google Material Icons -->
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-    <!-- FontAwesome (iconos) -->
     <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/fontawesome-free/css/all.min.css">
 
     <!-- AdminLTE Styles -->
     <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/dist/css/adminlte.css">
+    <link rel="stylesheet" href="style.css">
 
-    <!-- Custom CSS -->
     <style>
-        .timer {
-            font-size: 24px;
+        /* Global styles */
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        /* Header styling */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #1367C8;
+            color: white;
+        }
+
+        .header .logo img {
+            height: 50px;
+        }
+
+        .header .logo-text {
+            font-size: 1.2rem;
             font-weight: bold;
+            margin-left: 10px;
         }
 
-        .over-time {
-            color: red;
+        .nav-links {
+            display: flex;
+            gap: 15px;
         }
 
-        .in-time {
-            color: green;
+        .nav-links li {
+            list-style: none;
         }
 
-        .worker-box {
-            border: 1px solid #ccc;
-            padding: 20px;
-            /* Más espacio dentro del cuadro */
-            margin: 20px auto;
-            /* Centrar y mayor espacio vertical */
-            max-width: 600px;
-            /* Limitar el ancho máximo */
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            /* Fondo claro para destacar el cuadro */
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            /* Añadir sombra para un efecto flotante */
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
         }
 
-
-        .small-box {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            width: 250px;
-            z-index: 9999;
-            background-color: #f8f9fa;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        .btn {
+            background-color: white;
+            color: #1367C8;
+            border-radius: 4px;
+            padding: 5px 15px;
         }
 
-        #clock {
-            font-size: 36px;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-            /* Color más oscuro para mejor visibilidad */
+        /* Layout and container for main content */
+        .container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .mb-4 {
-            margin-bottom: 40px !important;
-            /* Más espacio entre los cuadros */
-            text-align: center;
-            /* Centramos el cuadro de búsqueda */
+        .left-section,
+        .right-section {
+            width: 45%;
+        }
+
+        .search-worker {
+            margin-bottom: 40px;
         }
 
         #searchWorker {
-            max-width: 400px;
-            /* Limitar el ancho del cuadro de búsqueda */
-            margin: 0 auto;
-            /* Centrar el cuadro */
+            width: 100%;
         }
 
         #searchResult div {
@@ -95,145 +97,233 @@
             background-color: #ddd;
         }
 
-
-        @media (max-width: 768px) {
-            .worker-box {
-                text-align: center;
-            }
+        /* Clock section styling */
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .arriba1 {
-            float: right;
-            margin-left: 0;
-            margin-bottom: 5px;
-            display: block;
-            margin-right: 5px;
+        .clock {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .clock .circle {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .digital-clock {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+
+        .digital-clock .time {
+            font-weight: bold;
+        }
+
+        /* Break timer box */
+        .worker-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .worker-box h4 {
+            text-align: center;
+            font-weight: bold;
+            color: #1367C8;
+        }
+
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
         }
 
         .btn-group {
-            display: block !important;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .head-modal {
-            background-color: #1367C8;
-            color: white;
+        /* Informe section styling */
+        .report-box {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
         }
 
-        .wrapper {
-            padding: 30px 15px;
-            /* Añadir un padding interno general */
-        }
-
-        h1.mb-4 {
+        .report-box h4 {
+            color: #333;
             text-align: center;
-            font-size: 28px;
-            margin-bottom: 30px;
-            font-weight: bold;
-            color: #1367C8;
-            /* Color más destacado para el título */
+            margin-bottom: 20px;
         }
 
-        button.btn {
-            margin: 5px;
-            width: 150px;
-            /* Igualar el tamaño de los botones */
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-section,
+            .right-section {
+                width: 100%;
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#" role="button">
-                        <i class="fas fa-user"></i> HOUSEN ELVIS
-                    </a>
-                </li>
+<div class="wrapper">
+    <!-- Header -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="/" class="brand-link">
+        <div class="logo">
+          <img src="../imagenes/logo_dre.png" alt="Logo de la marca" class="brand-image img-circle elevation-3">
+          <span class="brand-text font-weight-light">DRE-HUÁNUCO</span>
+        </div>
+      </a>
+
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- User Panel -->
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Principal -->
+
+            <!-- Registro de visitas -->
+            <li class="nav-item">
+              <a href="../welcome.php" class="nav-link">
+                <i class="material-icons">person_add</i>
+                <p>Registrar visitas</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="../reporte.php" class="nav-link">
+                <i class="material-icons">assessment</i>
+                <p>Reporte</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Cronometro_welcome.php" class="nav-link">
+                <i class="material-icons">access_time</i>
+                <p>Cronometro</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+     
+    <div class="content-wrapper" style="min-height: 678.031px;">
+    <header class="header">
+        <div class="logo">
+            <img src="../imagenes/logo_dre.png" alt="Logo de la marca">
+            <span class="logo-text">DRE-HUÁNUCO</span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="welcome.php">Registrar Visita</a></li>
+                <li><a href="reporte.php">Reporte</a></li>
+                <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
             </ul>
         </nav>
+        <a class="btn" href="https://www.drehuanuco.gob.pe/">
+            <button>Pagina Oficial</button>
+        </a>
+    </header>
 
-        <!-- Sidebar -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
-            <a href="/" class="brand-link">
-                <img src="https://gestionportales.regionhuanuco.gob.pe/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">Administración</span>
-            </a>
+    <!-- Main container -->
+    <div class="container">
+        <!-- Left section: Search worker -->
+        <div class="left-section">
+            <div class="search-worker">
+                <label for="searchWorker" class="form-label">Buscar Trabajador:</label>
+                <input type="text" id="searchWorker" class="form-control" placeholder="Ingrese el nombre del trabajador" onkeyup="searchWorker()">
+                <div id="searchResult" class="mt-2"></div>
+            </div>
 
-            <div class="sidebar">
-                <!-- User Panel -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <img src="http://goredigital.regionhuanuco.gob.pe/storage/avatar/logo.png" class="img-circle elevation-2" alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="#" class="d-block">HOUSEN ELVIS</a>
-                    </div>
+            <!-- Control de receso del trabajador -->
+            <div id="main-worker" class="worker-box">
+                <h4 id="worker-name">Trabajador 1</h4>
+                <div id="timer-1" class="timer in-time">15:00</div>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="startBreak(1)">Iniciar Receso</button>
+                    <button class="btn btn-danger" onclick="endBreak(1)" disabled>Finalizar Receso</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right section: Clock -->
+        <div class="right-section">
+            <div class="clock-container">
+                <!-- Reloj Analógico -->
+                <div class="clock">
+                    <div class="circle" id="sc" style="--clr:#04fc43;"><i></i></div>
+                    <div class="circle circle2" id="mn" style="--clr:#fee800;"><i></i></div>
+                    <div class="circle circle3" id="hr" style="--clr:#ff2972;"><i></i></div>
+                    <span style="--i:1;"><b>1</b></span>
+                    <span style="--i:2;"><b>2</b></span>
+                    <span style="--i:3;"><b>3</b></span>
+                    <span style="--i:4;"><b>4</b></span>
+                    <span style="--i:5;"><b>5</b></span>
+                    <span style="--i:6;"><b>6</b></span>
+                    <span style="--i:7;"><b>7</b></span>
+                    <span style="--i:8;"><b>8</b></span>
+                    <span style="--i:9;"><b>9</b></span>
+                    <span style="--i:10;"><b>10</b></span>
+                    <span style="--i:11;"><b>11</b></span>
+                    <span style="--i:12;"><b>12</b></span>
                 </div>
 
-                <!-- Sidebar Menu -->
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Principal -->
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="material-icons">home</i>
-                                <p>Principal</p>
-                            </a>
-                        </li>
-
-                        <!-- Registro de visitas -->
-                        <li class="nav-item">
-                            <a href="../welcome.php" class="nav-link">
-                                <i class="material-icons">person_add</i>
-                                <p>Registrar visitas</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../reporte.php" class="nav-link">
-                                <i class="material-icons">assessment</i>
-                                <p>Reporte</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="material-icons">visibility</i>
-                                <p>Vista para exterior</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="Cronometro_Trabajadores/Cronometro_welcome.php" class="nav-link">
-                                <i class="material-icons">access_time</i>
-                                <p>Cronometro</p>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                <!-- Reloj Digital -->
+                <div class="digital-clock">
+                    <div class="time">
+                        <span class="hour">00</span> :
+                        <span class="minute">00</span> :
+                        <span class="second">00</span>
+                        <span class="ampm">AM</span>
+                    </div>
+                </div>
             </div>
-        </aside>
-
-        <!-- Content Wrapper -->
-        <h1 class="mb-4">Control de Receso de Trabajadores</h1>
-
-        <!-- Reloj en tiempo real -->
-        <div id="clock" class="mb-5"></div>
-
-        <!-- Cuadro de búsqueda -->
-        <div class="mb-4">
-            <label for="searchWorker" class="form-label">Buscar Trabajador:</label>
-            <input type="text" id="searchWorker" class="form-control" placeholder="Ingrese el nombre del trabajador" onkeyup="searchWorker()">
-            <div id="searchResult" class="mt-2"></div> <!-- Aquí aparecerán los resultados -->
         </div>
+    </div>
 
-        <!-- Control de receso del trabajador -->
-        <div id="main-worker" class="worker-box">
-            <h4 id="worker-name">Trabajador 1</h4>
-            <div id="timer-1" class="timer in-time">15:00</div>
-            <button class="btn btn-success" onclick="startBreak(1)">Iniciar Receso</button>
-            <button class="btn btn-danger" onclick="endBreak(1)" disabled>Finalizar Receso</button>
+    <!-- Informe de receso -->
+    <div class="container mt-5">
+        <div class="report-box">
+            <h4>Informe de Receso</h4>
+            <p>Hora de inicio: <span id="start-time">10:00 AM</span></p>
+            <p>Tiempo de receso restante: <span id="remaining-time">5:00</span></p>
         </div>
+    </div>
+    </div>
+    <footer class="main-footer">
+      <strong>&copy; 2024 <a href="#">Portalweb</a>.</strong> Todos los derechos reservados.
+    </footer>
+  </div>
+
+
 
         <!-- Bootstrap JS and Popper -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -305,7 +395,46 @@
 
             // Inicializar reloj en tiempo real
             startClock();
+
+            let hr = document.querySelector('#hr');
+            let mn = document.querySelector('#mn');
+            let sc = document.querySelector('#sc');
+
+            setInterval(() => {
+                let day = new Date();
+                let hh = day.getHours() * 30;
+                let mm = day.getMinutes() * 6;
+                let ss = day.getSeconds() * 6;
+
+                // Corrección de comillas simples a backticks
+                hr.style.transform = `rotateZ(${hh + (mm / 12)}deg)`;
+                mn.style.transform = `rotateZ(${mm}deg)`; // Aquí era "mn" en vez de "mm"
+                sc.style.transform = `rotateZ(${ss}deg)`;
+            }, 1000); // Actualiza cada segundo
+            function updateClock() {
+                let now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                let seconds = now.getSeconds();
+                let ampm = hours >= 12 ? 'PM' : 'AM';
+
+                // Convert to 12-hour format
+                hours = hours % 12 || 12;
+
+                // Add leading zeros to minutes and seconds
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+
+                document.querySelector('.hour').textContent = hours;
+                document.querySelector('.minute').textContent = minutes;
+                document.querySelector('.second').textContent = seconds;
+                document.querySelector('.ampm').textContent = ampm;
+            }
+
+            setInterval(updateClock, 1000);
+            updateClock(); // Initialize clock immediately
         </script>
+
 </body>
 
 </html>

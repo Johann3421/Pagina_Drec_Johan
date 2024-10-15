@@ -14,7 +14,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar la conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+  die("Conexión fallida: " . $conn->connect_error);
 }
 
 // Parámetro de filtro por fecha (si existe)
@@ -28,12 +28,12 @@ $sql = "SELECT * FROM visitas WHERE (hora_salida IS NULL OR hora_salida = '')";
 
 // Si hay un parámetro de fecha, agregamos el filtro por fecha
 if (!empty($fecha)) {
-    $sql .= " AND fecha = ?";
+  $sql .= " AND fecha = ?";
 }
 
 // Si hay búsqueda, agregarla a la consulta
 if (!empty($busqueda)) {
-    $sql .= " AND (nombre LIKE ? OR dni LIKE ? OR smotivo LIKE ? OR lugar LIKE ?)";
+  $sql .= " AND (nombre LIKE ? OR dni LIKE ? OR smotivo LIKE ? OR lugar LIKE ?)";
 }
 
 // Agregamos la paginación
@@ -44,15 +44,15 @@ $stmt = $conn->prepare($sql);
 
 // Si hay fecha y búsqueda, los incluimos en los parámetros
 if (!empty($fecha) && !empty($busqueda)) {
-    $busqueda_param = '%' . $busqueda . '%';
-    $stmt->bind_param('sssssii', $fecha, $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param, $limite, $offset);
+  $busqueda_param = '%' . $busqueda . '%';
+  $stmt->bind_param('sssssii', $fecha, $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param, $limite, $offset);
 } elseif (!empty($fecha)) {
-    $stmt->bind_param('sii', $fecha, $limite, $offset);
+  $stmt->bind_param('sii', $fecha, $limite, $offset);
 } elseif (!empty($busqueda)) {
-    $busqueda_param = '%' . $busqueda . '%';
-    $stmt->bind_param('ssssii', $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param, $limite, $offset);
+  $busqueda_param = '%' . $busqueda . '%';
+  $stmt->bind_param('ssssii', $busqueda_param, $busqueda_param, $busqueda_param, $busqueda_param, $limite, $offset);
 } else {
-    $stmt->bind_param('ii', $limite, $offset);
+  $stmt->bind_param('ii', $limite, $offset);
 }
 
 // Ejecutar la consulta
@@ -62,12 +62,12 @@ $result = $stmt->get_result();
 // Obtener el número total de registros que tienen hora_salida vacía (para paginación)
 $sql_total = "SELECT COUNT(*) as total FROM visitas WHERE (hora_salida IS NULL OR hora_salida = '')";
 if (!empty($fecha)) {
-    $sql_total .= " AND fecha = ?";
+  $sql_total .= " AND fecha = ?";
 }
 
 $stmt_total = $conn->prepare($sql_total);
 if (!empty($fecha)) {
-    $stmt_total->bind_param('s', $fecha);
+  $stmt_total->bind_param('s', $fecha);
 }
 $stmt_total->execute();
 $result_total = $stmt_total->get_result();
@@ -147,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/dist/css/adminlte.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 
 
 
@@ -174,46 +175,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#" role="button">
-            <i class="fas fa-user"></i> HOUSEN ELVIS
-          </a>
-        </li>
-      </ul>
-    </nav>
-
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
       <a href="/" class="brand-link">
-        <img src="https://gestionportales.regionhuanuco.gob.pe/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Administración</span>
+        <div class="logo">
+          <img src="./imagenes/logo_dre.png" alt="Logo de la marca" class="brand-image img-circle elevation-3">
+          <span class="brand-text font-weight-light">DRE-HUÁNUCO</span>
+        </div>
       </a>
+
 
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- User Panel -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="http://goredigital.regionhuanuco.gob.pe/storage/avatar/logo.png" class="img-circle elevation-2" alt="User Image">
-          </div>
-          <div class="info">
-            <a href="#" class="d-block">HOUSEN ELVIS</a>
-          </div>
-        </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Principal -->
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="material-icons">home</i>
-                <p>Principal</p>
-              </a>
-            </li>
 
             <!-- Registro de visitas -->
             <li class="nav-item">
@@ -226,12 +206,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <a href="reporte.php" class="nav-link">
                 <i class="material-icons">assessment</i>
                 <p>Reporte</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="material-icons">visibility</i>
-                <p>Vista para exterior</p>
               </a>
             </li>
             <li class="nav-item">
@@ -263,6 +237,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <!-- Content Wrapper -->
     <div class="content-wrapper" style="min-height: 678.031px;">
+      <header class="header">
+        <div class="logo">
+          <img src="./imagenes/logo_dre.png" alt="Logo de la marca">
+          <span class="logo-text">DRE-HUÁNUCO</span>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="welcome.php">Registrar Visita</a></li>
+            <li><a href="reporte.php">Reporte</a></li>
+            <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
+          </ul>
+        </nav>
+        <a class="btn" href="https://www.drehuanuco.gob.pe/"><button>Pagina Oficial</button></a>
+      </header>
+
       <!-- Content Header (Page header) -->
       <section class="content-header">
         <div class="container-fluid">
@@ -362,35 +351,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                               <option value="ALMACEN" data-id="559" data-select2-id="30">ALMACEN</option>
                               <option value="ARCHIVO" data-id="554" data-select2-id="31">ARCHIVO</option>
                               <option value="AUDITORIO PRINCIPAL" data-id="602" data-select2-id="60">AUDITORIO PRINCIPAL</option>
+                              <option value="AUDITORIO DESPACHO DIRECTORAL" data-id="603" data-select2-id="61">AUDITORIO DESPACHO DIRECTORAL</option>
                               <option value="BIENESTAR SOCIAL" data-id="564" data-select2-id="32">BIENESTAR SOCIAL</option>
                               <option value="CONTABILIDAD" data-id="563" data-select2-id="33">CONTABILIDAD</option>
                               <option value="CONSTANCIA DE PAGO" data-id="580" data-select2-id="57">CONSTANCIA DE PAGO</option>
                               <option value="DIRECCION DE ASESORIA JURIDICA" data-id="564" data-select2-id="56">DIRECCION DE ASESORIA JURIDICA</option>
-                              <option value="DIRECCIÓN DE GESTIÓN ADMINISTRATIVA" data-id="170" data-select2-id="34">DIRECCIÓN DE GESTIÓN ADMINISTRATIVA</option>
-                              <option value="DIRECCIÓN DE GESTIÓN INSTITUCIONAL" data-id="168" data-select2-id="35">DIRECCIÓN DE GESTIÓN INSTITUCIONAL</option>
-                              <option value="DIRECCIÓN DE GESTIÓN PEDAGÓGICA" data-id="167" data-select2-id="36">DIRECCIÓN DE GESTIÓN PEDAGÓGICA</option>
-                              <option value="DIRECCIÓN REGIONAL DE EDUCACIÓN-TRAMITE DOCUMENTARIO" data-id="197" data-select2-id="28">DIRECCIÓN REGIONAL DE EDUCACIÓN-TRAMITE DOCUMENTARIO</option>
-                              <option value="DIRECCIÓN REGIONAL" data-id="166" data-select2-id="37">DIRECCIÓN REGIONAL</option>
+                              <option value="DIRECCION DE GESTION ADMINISTRATIVA" data-id="170" data-select2-id="34">DIRECCION DE GESTION ADMINISTRATIVA</option>
+                              <option value="DIRECCION DE GESTION INSTITUCIONAL" data-id="168" data-select2-id="35">DIRECCION DE GESTION INSTITUCIONAL</option>
+                              <option value="DIRECCION DE GESTION PEDAGOGICA" data-id="167" data-select2-id="36">DIRECCION DE GESTION PEDAGOGICA</option>
+                              <option value="DIRECCION REGIONAL DE EDUCACION-TRAMITE DOCUMENTARIO" data-id="197" data-select2-id="28">DIRECCION REGIONAL DE EDUCACIÓN-TRAMITE DOCUMENTARIO</option>
+                              <option value="DIRECCION REGIONAL" data-id="166" data-select2-id="37">DIRECCION REGIONAL</option>
                               <option value="ESCALAFON" data-id="556" data-select2-id="38">ESCALAFON</option>
-                              <option value="ESTADÍSTICA" data-id="566" data-select2-id="39">ESTADÍSTICA</option>
-                              <option value="INFORMÁTICA" data-id="567" data-select2-id="40">INFORMÁTICA</option>
+                              <option value="ESTADISTICA" data-id="566" data-select2-id="39">ESTADISTICA</option>
+                              <option value="INFORMATICA" data-id="567" data-select2-id="40">INFORMATICA</option>
                               <option value="INFRAESTRUCTURA" data-id="568" data-select2-id="41">INFRAESTRUCTURA</option>
-                              <option value="OFICINA DE ASESORÍA JURÍDICA" data-id="169" data-select2-id="42">OFICINA DE ASESORÍA JURÍDICA</option>
+                              <option value="OFICINA DE ASESORIA JURIDICA" data-id="169" data-select2-id="42">OFICINA DE ASESORIA JURIDICA</option>
                               <option value="OFICINA DE CONTROL INSTITUCIONAL" data-id="171" data-select2-id="43">OFICINA DE CONTROL INSTITUCIONAL</option>
                               <option value="PATRIMONIO" data-id="560" data-select2-id="44">PATRIMONIO</option>
                               <option value="PERSONAL" data-id="555" data-select2-id="45">PERSONAL</option>
-                              <option value="PLANIFICACIÓN" data-id="570" data-select2-id="46">PLANIFICACIÓN</option>
+                              <option value="PLANIFICACION" data-id="570" data-select2-id="46">PLANIFICACION</option>
                               <option value="PLANILLAS" data-id="557" data-select2-id="47">PLANILLAS</option>
                               <option value="PP 051 - PTCD" data-id="600" data-select2-id="58">PP 051 - PTCD</option>
                               <option value="PP 068 - PREVAED" data-id="601" data-select2-id="59">PP 068 - PREVAED</option>
+                              <option value="PP  0147 - INSTITUTOS TECNOLOGICOS" data-id="604" data-select2-id="62">PP 0147 - INSTITUTOS TECNOLOGICOS</option>
+                              <option value="PP 106 - CONVIVENCIA" data-id="605" data-select2-id="63">PP 106 - CONVIVENCIA</option>
+                              <option value="PP 107 - ESPECIALISTA SEGUIMIENTO Y MONITOREO" data-id="606" data-select2-id="64">PP 107 - ESPECIALISTA SEGUIMIENTO Y MONITOREO</option>
                               <option value="PRESUPUESTO" data-id="571" data-select2-id="48">PRESUPUESTO</option>
                               <option value="PROYECTOS" data-id="572" data-select2-id="49">PROYECTOS</option>
-                              <option value="RACIONALIZACIÓN" data-id="565" data-select2-id="50">RACIONALIZACIÓN</option>
+                              <option value="RACIONALIZACION" data-id="565" data-select2-id="50">RACIONALIZACION</option>
                               <option value="RELACIONES PUBLICAS" data-id="1898" data-select2-id="51">RELACIONES PUBLICAS</option>
                               <option value="SECRETARIA GENERAL" data-id="553" data-select2-id="52">SECRETARIA GENERAL</option>
                               <option value="SECRETARIA TECNICA" data-id="2480" data-select2-id="53">SECRETARIA TECNICA</option>
                               <option value="SERVICIOS GENERALES" data-id="561" data-select2-id="2">SERVICIOS GENERALES</option>
-                              <option value="TESORERÍA" data-id="562" data-select2-id="55">TESORERÍA</option>
+                              <option value="TESORERÍA" data-id="562" data-select2-id="55">TESORERIA</option>
                             </select>
                             <div id="iddireccionesweb_error" class="text-danger" style="font-size: 12px;"></div>
                             <div id="oficodigo_error" class="text-danger" style="font-size: 12px;"></div>
@@ -506,7 +499,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           <th>Hora Salida</th>
                           <th>Motivo</th>
                           <th>Lugar Especifico</th>
-                          <th>Observaciones</th>
                           <th>Imprimir Ticket</th>
                         </tr>
                       </thead>
@@ -526,7 +518,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo "<td>" . (isset($row['hora_salida']) ? $row['hora_salida'] : 'N/A') . "</td>";
                             echo "<td>" . $row['smotivo'] . "</td>";
                             echo "<td>" . $row['lugar'] . "</td>";
-                            echo "<td>" . (isset($row['observaciones']) ? $row['observaciones'] : 'N/A') . "</td>";
                             echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'><i class='material-icons'>print</i></button></td>";
                             echo "</tr>";
                           }
@@ -661,18 +652,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
           if (xhr.responseText.includes("Salida registrada correctamente.")) {
-            alert("Salida registrada correctamente.");
+            // Mostrar el mensaje temporalmente sin un alert
+            mostrarMensajeTemporal("Salida registrada correctamente.", "success");
 
             // Ocultar la fila después de registrar la salida
             document.getElementById("fila_" + id).style.display = "none";
           } else {
-            alert("Error al registrar la salida: " + xhr.responseText);
+            mostrarMensajeTemporal("Error al registrar la salida: " + xhr.responseText, "error");
           }
         }
       };
 
       xhr.send("id=" + id); // Solo enviamos el ID
     }
+
+    function mostrarMensajeTemporal(mensaje, tipo) {
+      // Crear un div temporal para el mensaje
+      var mensajeDiv = document.createElement("div");
+      mensajeDiv.textContent = mensaje;
+      mensajeDiv.style.position = "fixed";
+      mensajeDiv.style.top = "10px";
+      mensajeDiv.style.right = "10px";
+      mensajeDiv.style.padding = "10px";
+      mensajeDiv.style.backgroundColor = tipo === "success" ? "#28a745" : "#dc3545";
+      mensajeDiv.style.color = "white";
+      mensajeDiv.style.borderRadius = "5px";
+      mensajeDiv.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.1)";
+
+      // Agregar el mensaje al cuerpo del documento
+      document.body.appendChild(mensajeDiv);
+
+      // Eliminar el mensaje después de 3 segundos
+      setTimeout(function() {
+        mensajeDiv.remove();
+      }, 3000);
+    }
+
 
 
 

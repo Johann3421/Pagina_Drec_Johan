@@ -52,6 +52,7 @@ $total_paginas = ceil($total_filas / $limite);
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/dist/css/adminlte.css">
+  <link rel="stylesheet" href="styles.css">
 
   <style>
     .arriba1 {
@@ -76,46 +77,26 @@ $total_paginas = ceil($total_filas / $limite);
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#" role="button">
-            <i class="fas fa-user"></i> HOUSEN ELVIS
-          </a>
-        </li>
-      </ul>
-    </nav>
 
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
       <a href="/" class="brand-link">
-        <img src="https://gestionportales.regionhuanuco.gob.pe/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Administración</span>
+        <div class="logo">
+          <img src="./imagenes/logo_dre.png" alt="Logo de la marca" class="brand-image img-circle elevation-3">
+          <span class="brand-text font-weight-light">DRE-HUÁNUCO</span>
+        </div>
       </a>
+
 
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- User Panel -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="http://goredigital.regionhuanuco.gob.pe/storage/avatar/logo.png" class="img-circle elevation-2" alt="User Image">
-          </div>
-          <div class="info">
-            <a href="#" class="d-block">HOUSEN ELVIS</a>
-          </div>
-        </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Principal -->
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="material-icons">home</i>
-                <p>Principal</p>
-              </a>
-            </li>
 
             <!-- Registro de visitas -->
             <li class="nav-item">
@@ -128,12 +109,6 @@ $total_paginas = ceil($total_filas / $limite);
               <a href="reporte.php" class="nav-link">
                 <i class="material-icons">assessment</i>
                 <p>Reporte</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="material-icons">visibility</i>
-                <p>Vista para exterior</p>
               </a>
             </li>
             <li class="nav-item">
@@ -162,6 +137,20 @@ $total_paginas = ceil($total_filas / $limite);
     </script>
 
     <div class="content-wrapper" style="min-height: 678.031px;">
+      <header class="header">
+        <div class="logo">
+          <img src="./imagenes/logo_dre.png" alt="Logo de la marca">
+          <span class="logo-text">DRE-HUÁNUCO</span>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="welcome.php">Registrar Visita</a></li>
+            <li><a href="reporte.php">Reporte</a></li>
+            <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
+          </ul>
+        </nav>
+        <a class="btn" href="https://www.drehuanuco.gob.pe/"><button>Pagina Oficial</button></a>
+      </header>
       <div class="container-fluid my-4">
         <h1>Reporte de Salidas</h1>
 
@@ -190,7 +179,6 @@ $total_paginas = ceil($total_filas / $limite);
               <th>Hora Salida</th>
               <th>Motivo</th>
               <th>Lugar Específico</th>
-              <th>Imprimir Ticket</th>
             </tr>
           </thead>
           <tbody>
@@ -207,7 +195,6 @@ $total_paginas = ceil($total_filas / $limite);
                 echo "<td>" . $row['hora_salida'] . "</td>";
                 echo "<td>" . $row['smotivo'] . "</td>";
                 echo "<td>" . $row['lugar'] . "</td>";
-                echo "<td><button class='btn btn-success' onclick='imprimirTicket({$row['id']})'><i class='material-icons'>print</i></button></td>";
                 echo "</tr>";
               }
             } else {
