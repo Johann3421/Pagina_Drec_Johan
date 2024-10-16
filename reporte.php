@@ -137,10 +137,10 @@ $total_paginas = ceil($total_filas / $limite);
     </script>
 
     <div class="content-wrapper" style="min-height: 678.031px;">
-      <header class="header">
+    <header class="header">
         <div class="logo">
           <img src="./imagenes/logo_dre.png" alt="Logo de la marca">
-          <span class="logo-text">DRE-HUÁNUCO</span>
+          <span class="logo-text">DIRECCION REGIONAL DE EDUCACION HUÁNUCO</span>
         </div>
         <nav>
           <ul class="nav-links">
@@ -149,7 +149,6 @@ $total_paginas = ceil($total_filas / $limite);
             <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
           </ul>
         </nav>
-        <a class="btn" href="https://www.drehuanuco.gob.pe/"><button>Pagina Oficial</button></a>
       </header>
       <div class="container-fluid my-4">
         <h1>Reporte de Salidas</h1>

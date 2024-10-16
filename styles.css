@@ -25,7 +25,7 @@
     /* Tamaño más grande para el logo */
     width: auto;
     transition: all 0.3s;
-    margin-left: -30%;
+    margin-left: -20%;
 }
 
 .header .logo img:hover {
@@ -86,3 +86,29 @@
     color: #ffbc0e;
     transform: scale(1.1);
 }
+/* Ajustamos el contenedor para evitar restricciones */
+#nomoficina-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los botones se organicen en varias líneas si es necesario */
+    gap: 10px; /* Espacio entre botones */
+  }
+
+  .option-btn {
+    padding: 10px 20px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  .option-btn:hover {
+    background-color: #00aeff;
+    color: white;
+  }
+
+  .option-btn.selected {
+    background-color: #00aeff;
+    color: white;
+    transform: scale(1.05); /* Destaca el botón seleccionado */
+  }
