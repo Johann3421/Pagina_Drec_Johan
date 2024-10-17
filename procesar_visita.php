@@ -46,7 +46,12 @@ if (isset($_POST['dni'], $_POST['nombre'], $_POST['tipopersona'], $_POST['smotiv
     $stmt->close();
     
 } else {
-    echo "Error: Faltan datos en el formulario";
+    // Mostrar alerta de error y detener ejecución
+    echo "<script type='text/javascript'>
+            alert('Error: Faltan datos en el formulario');
+            window.history.back(); // Regresa a la página anterior para que el usuario corrija los datos
+          </script>";
+    exit(); // Detiene el flujo del script PHP
 }
 
 // Cerrar la conexión

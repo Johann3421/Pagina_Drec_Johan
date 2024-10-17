@@ -140,11 +140,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <meta name="csrf-token" content="AwHz0tWjMBpWFfS0XyLgAQhEw3dNiztPFnaACgCt">
   <title>Portalweb | Registro Visitas</title>
 
-  <link rel="icon" type="image/png" href="https://gestionportales.regionhuanuco.gob.pe/dist/img/favicon.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/plugins/select2/css/select2.min.css">
-  <link rel="stylesheet" href="https://gestionportales.regionhuanuco.gob.pe/dist/css/adminlte.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
@@ -334,189 +333,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="col-lg-12 col-md-12 col-sm-12">
                           <div class="form-group">
                             <label for="nomoficina">Oficina:</label>
-                            <div class="form-group">
-                              <label><strong>Seleccione la Oficina:</strong></label>
-                              <div class="row">
-                                <!-- Primera columna -->
-                                <div class="col-md-6">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina0" value="SELECCIONE" checked>
-                                    <label class="form-check-label" for="oficina0">&lt;&lt; SELECCIONE &gt;&gt;</label>
-                                  </div>
+                            <select id="nomoficina" class="form-control select2 form-control-sm" onchange="updateLugarByOficina()">
+                              <option value="SELECCIONE" selected>&lt;&lt; SELECCIONE &gt;&gt;</option> <!-- Solo esta opción tiene selected -->
+                              <!-- Más opciones aquí -->
 
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina1" value="ABASTECIMIENTO" data-id="558">
-                                    <label class="form-check-label" for="oficina1">ABASTECIMIENTO</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina2" value="ALMACEN" data-id="559">
-                                    <label class="form-check-label" for="oficina2">ALMACEN</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina3" value="ARCHIVO" data-id="554">
-                                    <label class="form-check-label" for="oficina3">ARCHIVO</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina4" value="AUDITORIO PRINCIPAL" data-id="602">
-                                    <label class="form-check-label" for="oficina4">AUDITORIO PRINCIPAL</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina5" value="AUDITORIO DESPACHO DIRECTORAL" data-id="603">
-                                    <label class="form-check-label" for="oficina5">AUDITORIO DESPACHO DIRECTORAL</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina6" value="BIENESTAR SOCIAL" data-id="564">
-                                    <label class="form-check-label" for="oficina6">BIENESTAR SOCIAL</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina7" value="CONTABILIDAD" data-id="563">
-                                    <label class="form-check-label" for="oficina7">CONTABILIDAD</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina8" value="CONSTANCIA DE PAGO" data-id="580">
-                                    <label class="form-check-label" for="oficina8">CONSTANCIA DE PAGO</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina9" value="DIRECCION DE ASESORIA JURIDICA" data-id="564">
-                                    <label class="form-check-label" for="oficina9">DIRECCION DE ASESORIA JURIDICA</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina10" value="DIRECCION DE GESTION ADMINISTRATIVA" data-id="170">
-                                    <label class="form-check-label" for="oficina10">DIRECCION DE GESTION ADMINISTRATIVA</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina11" value="DIRECCION DE GESTION INSTITUCIONAL" data-id="168">
-                                    <label class="form-check-label" for="oficina11">DIRECCION DE GESTION INSTITUCIONAL</label>
-                                  </div>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina11" value="ESCALAFON" data-id="168">
-                                    <label class="form-check-label" for="oficina12">ESCALAFON</label>
-                                  </div>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina11" value="ESTADISTICA" data-id="168">
-                                    <label class="form-check-label" for="oficina13">ESTADISTICA</label>
-                                  </div>
-                                </div>
-
-
-                                <!-- Segunda columna -->
-                                <div class="col-md-6">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina12" value="INFORMATICA" data-id="567">
-                                    <label class="form-check-label" for="oficina14">INFORMATICA</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina13" value="INFRAESTRUCTURA" data-id="568">
-                                    <label class="form-check-label" for="oficina15">INFRAESTRUCTURA</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina14" value="OFICINA DE CONTROL INSTITUCIONAL" data-id="171">
-                                    <label class="form-check-label" for="oficina16">OFICINA DE CONTROL INSTITUCIONAL</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina15" value="PATRIMONIO" data-id="560">
-                                    <label class="form-check-label" for="oficina17">PATRIMONIO</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina16" value="PERSONAL" data-id="555">
-                                    <label class="form-check-label" for="oficina18">PERSONAL</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina17" value="PLANIFICACION" data-id="570">
-                                    <label class="form-check-label" for="oficina19">PLANIFICACION</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina18" value="PLANILLAS" data-id="557">
-                                    <label class="form-check-label" for="oficina20">PLANILLAS</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina19" value="PP 051 - PTCD" data-id="600">
-                                    <label class="form-check-label" for="oficina21">PP 051 - PTCD</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina20" value="PP 068 - PREVAED" data-id="601">
-                                    <label class="form-check-label" for="oficina22">PP 068 - PREVAED</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina20" value="PP 0147 - INSTITUTOS TECNOLOGICOS" data-id="601">
-                                    <label class="form-check-label" for="oficina23">PP 0147 - INSTITUTOS TECNOLOGICOS</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina21" value="PP 106 - CONVIVENCIA" data-id="605">
-                                    <label class="form-check-label" for="oficina24">PP 106 - CONVIVENCIA</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina22" value="PP 107 - ESPECIALISTA SEGUIMIENTO Y MONITOREO" data-id="606">
-                                    <label class="form-check-label" for="oficina25">PP 107 - ESPECIALISTA SEGUIMIENTO Y MONITOREO</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina22" value="PRESUPUESTO" data-id="606">
-                                    <label class="form-check-label" for="oficina26">PRESUPUESTO</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina22" value="PROYECTOS" data-id="606">
-                                    <label class="form-check-label" for="oficina27">PROYECTOS</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina22" value="RACIONALIZACION" data-id="606">
-                                    <label class="form-check-label" for="oficina28">RACIONALIZACION</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina22" value="RELACIONES PUBLICAS" data-id="606">
-                                    <label class="form-check-label" for="oficina29">RELACIONES PUBLICAS</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina23" value="SECRETARIA GENERAL" data-id="553">
-                                    <label class="form-check-label" for="oficina30">SECRETARIA GENERAL</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina23" value="SECRETARIA TECNICA" data-id="553">
-                                    <label class="form-check-label" for="oficina31">SECRETARIA TECNICA</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina24" value="SERVICIOS GENERALES" data-id="561">
-                                    <label class="form-check-label" for="oficina32">SERVICIOS GENERALES</label>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="nomoficina" id="oficina24" value="TESORERIA" data-id="561">
-                                    <label class="form-check-label" for="oficina33">TESORERIA</label>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+                              <option value="ABASTECIMIENTO" data-id="558" data-select2-id="29">ABASTECIMIENTO</option>
+                              <option value="ALMACEN" data-id="559" data-select2-id="30">ALMACEN</option>
+                              <option value="ARCHIVO" data-id="554" data-select2-id="31">ARCHIVO</option>
+                              <option value="AUDITORIO PRINCIPAL" data-id="602" data-select2-id="60">AUDITORIO PRINCIPAL</option>
+                              <option value="AUDITORIO DESPACHO DIRECTORAL" data-id="603" data-select2-id="61">AUDITORIO DESPACHO DIRECTORAL</option>
+                              <option value="BIENESTAR SOCIAL" data-id="564" data-select2-id="32">BIENESTAR SOCIAL</option>
+                              <option value="CONTABILIDAD" data-id="563" data-select2-id="33">CONTABILIDAD</option>
+                              <option value="CONSTANCIA DE PAGO" data-id="580" data-select2-id="57">CONSTANCIA DE PAGO</option>
+                              <option value="DIRECCION DE ASESORIA JURIDICA" data-id="564" data-select2-id="56">DIRECCION DE ASESORIA JURIDICA</option>
+                              <option value="DIRECCION DE GESTION ADMINISTRATIVA" data-id="170" data-select2-id="34">DIRECCION DE GESTION ADMINISTRATIVA</option>
+                              <option value="DIRECCION DE GESTION INSTITUCIONAL" data-id="168" data-select2-id="35">DIRECCION DE GESTION INSTITUCIONAL</option>
+                              <option value="DIRECCION DE GESTION PEDAGOGICA" data-id="167" data-select2-id="36">DIRECCION DE GESTION PEDAGOGICA</option>
+                              <option value="DIRECCION REGIONAL DE EDUCACION-TRAMITE DOCUMENTARIO" data-id="197" data-select2-id="28">DIRECCION REGIONAL DE EDUCACIÓN-TRAMITE DOCUMENTARIO</option>
+                              <option value="DIRECCION REGIONAL" data-id="166" data-select2-id="37">DIRECCION REGIONAL</option>
+                              <option value="ESCALAFON" data-id="556" data-select2-id="38">ESCALAFON</option>
+                              <option value="ESTADISTICA" data-id="566" data-select2-id="39">ESTADISTICA</option>
+                              <option value="INFORMATICA" data-id="567" data-select2-id="40">INFORMATICA</option>
+                              <option value="INFRAESTRUCTURA" data-id="568" data-select2-id="41">INFRAESTRUCTURA</option>
+                              <option value="OFICINA DE ASESORIA JURIDICA" data-id="169" data-select2-id="42">OFICINA DE ASESORIA JURIDICA</option>
+                              <option value="OFICINA DE CONTROL INSTITUCIONAL" data-id="171" data-select2-id="43">OFICINA DE CONTROL INSTITUCIONAL</option>
+                              <option value="PATRIMONIO" data-id="560" data-select2-id="44">PATRIMONIO</option>
+                              <option value="PERSONAL" data-id="555" data-select2-id="45">PERSONAL</option>
+                              <option value="PLANIFICACION" data-id="570" data-select2-id="46">PLANIFICACION</option>
+                              <option value="PLANILLAS" data-id="557" data-select2-id="47">PLANILLAS</option>
+                              <option value="PP 051 - PTCD" data-id="600" data-select2-id="58">PP 051 - PTCD</option>
+                              <option value="PP 068 - PREVAED" data-id="601" data-select2-id="59">PP 068 - PREVAED</option>
+                              <option value="PP  0147 - INSTITUTOS TECNOLOGICOS" data-id="604" data-select2-id="62">PP 0147 - INSTITUTOS TECNOLOGICOS</option>
+                              <option value="PP 106 - CONVIVENCIA" data-id="605" data-select2-id="63">PP 106 - CONVIVENCIA</option>
+                              <option value="PP 107 - ESPECIALISTA SEGUIMIENTO Y MONITOREO" data-id="606" data-select2-id="64">PP 107 - ESPECIALISTA SEGUIMIENTO Y MONITOREO</option>
+                              <option value="PRESUPUESTO" data-id="571" data-select2-id="48">PRESUPUESTO</option>
+                              <option value="PROYECTOS" data-id="572" data-select2-id="49">PROYECTOS</option>
+                              <option value="RACIONALIZACION" data-id="565" data-select2-id="50">RACIONALIZACION</option>
+                              <option value="RELACIONES PUBLICAS" data-id="1898" data-select2-id="51">RELACIONES PUBLICAS</option>
+                              <option value="SECRETARIA GENERAL" data-id="553" data-select2-id="52">SECRETARIA GENERAL</option>
+                              <option value="SECRETARIA TECNICA" data-id="2480" data-select2-id="53">SECRETARIA TECNICA</option>
+                              <option value="SERVICIOS GENERALES" data-id="561" data-select2-id="2">SERVICIOS GENERALES</option>
+                              <option value="TESORERÍA" data-id="562" data-select2-id="55">TESORERIA</option>
+                            </select>
                             <div id="iddireccionesweb_error" class="text-danger" style="font-size: 12px;"></div>
                             <div id="oficodigo_error" class="text-danger" style="font-size: 12px;"></div>
                             <div id="nomoficina_error" class="text-danger" style="font-size: 12px;"></div>
@@ -579,19 +437,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
               </form>
               <div class="col-lg-3 col-md-3 col-sm-12">
-                <div class="form-group">
-                  <input type="hidden" id="fechabusqueda" name="fechabusqueda" value="07/10/2024 - 07/10/2024">
-                  <div class="input-group mb-3">
-                    <input type="date" id="fecha-filtro" class="form-control" placeholder="Selecciona una fecha">
-                    <span class="input-group-append">
-                      <button type="button" class="btn btn-default" id="filtrar-fecha-btn">
-                        <i class="fa fa-calendar-alt"></i> Filtrar
-                      </button>
-                    </span>
-                  </div>
-
-
-                </div>
+                
               </div>
             </div>
             <div class="row">
@@ -599,9 +445,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div id="tblvisita_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                   <div class="row col-lg-12 col-md-12 col-sm-12 arriba1">
                     <div class="dt-buttons btn-group flex-wrap">
-                      <div class="mb-3">
-                        <a href="exportar_excel.php" class="btn btn-success">Exportar a Excel</a>
-                      </div>
+                      
                     </div>
                   </div>
                   <div class="arriba2">
