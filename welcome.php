@@ -272,7 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
         <!-- Formulario de Registro de Visita -->
-        <form id="frmvisita" class="frmvisita" method="post" action="procesar_visita.php">
+        <form id="frmvisita" class="frmvisita" method="post" action="procesar_visita.php" onsubmit="return validarFormulario();">
           <div class="container-fluid">
             <form id="frmvisita" class="frmvisita" method="post">
               <input type="hidden" name="_token" value="AwHz0tWjMBpWFfS0XyLgAQhEw3dNiztPFnaACgCt">
@@ -286,7 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       <div class="row">
                         <div class="col-lg-3 col-md-3 col-sm-12">
                           <label for="ndocu">DNI:</label>
-                          <input type="text" maxlength="8" class="form-control form-control-sm" name="dni" id="ndocu" placeholder="Nro Documento" onkeypress="return esNumerico(event)" onblur="buscarPorDNI()">
+                          <input type="text" maxlength="8" class="form-control form-control-sm" name="dni" id="ndocu" placeholder="Nro Documento" onkeypress="return esNumerico(event)" onkeydown="return noSubmitEnter(event)" onblur="buscarPorDNI()">
                           <div id="dni_error" class="text-danger" style="font-size: 12px;"></div>
                         </div>
                         <div class="col-lg-9 col-md-9 col-sm-12">
@@ -422,6 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
           </div>
         </form>
+
         <!-- Lista de Visitas -->
         <div class="card card-info mb-3">
           <div class="card-header">
@@ -437,7 +438,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
               </form>
               <div class="col-lg-3 col-md-3 col-sm-12">
-                
+
               </div>
             </div>
             <div class="row">
@@ -445,7 +446,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div id="tblvisita_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                   <div class="row col-lg-12 col-md-12 col-sm-12 arriba1">
                     <div class="dt-buttons btn-group flex-wrap">
-                      
+
                     </div>
                   </div>
                   <div class="arriba2">
@@ -715,6 +716,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         alert("Por favor, selecciona una fecha.");
       }
     });
+
+    function noSubmitEnter(event) {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Evitar que se envíe el formulario
+        return false;
+      }
+      return true;
+    }
+
+    // Validar el formulario antes de enviarlo
+    function validarFormulario() {
+      var dni = document.getElementById("ndocu").value;
+      var nombre = document.getElementById("nombre").value;
+
+      // Limpiar errores previos
+      document.getElementById("dni_error").innerHTML = "";
+      document.getElementById("nombre_error").innerHTML = "";
+
+      // Validar DNI
+      if (dni === "" || dni.length !== 8) {
+        document.getElementById("dni_error").innerHTML = "El DNI debe tener 8 dígitos.";
+        return false; // No envíes el formulario
+      }
+
+      // Validar Nombres y Apellidos
+      if (nombre === "") {
+        document.getElementById("nombre_error").innerHTML = "El nombre es obligatorio.";
+        return false; // No envíes el formulario
+      }
+
+      // Si todas las validaciones pasan, permite el envío
+      return true;
+    }
   </script>
 
 

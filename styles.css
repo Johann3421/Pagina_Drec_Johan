@@ -112,3 +112,121 @@
     color: white;
     transform: scale(1.05); /* Destaca el botón seleccionado */
   }
+  /* General Styles */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  /* Sidebar Styles */
+  .main-sidebar {
+    flex-basis: 250px;
+    min-height: 100vh;
+    background-color: #343a40;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  @media (max-width: 768px) {
+    .main-sidebar {
+      flex-basis: 100%;
+      height: auto;
+      position: relative;
+    }
+  }
+  
+  /* Adjust logo inside sidebar */
+  .logo img {
+    max-width: 60px;
+    height: auto;
+  }
+  
+  /* Content Wrapper Styles */
+  .content-wrapper {
+    flex-grow: 1;
+    background-color: #f4f6f9;
+    padding: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 15px;
+    }
+  }
+  
+  /* Content inside Cards */
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  @media (max-width: 576px) {
+    .card .card-body {
+      padding: 10px;
+    }
+  }
+  
+  /* Navbar and Links */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #00aeff;
+  }
+  
+  .header .logo img {
+    max-width: 80px;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-links li {
+    margin-left: 10px;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 768px) {
+    .nav-links {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .nav-links li {
+      margin-bottom: 10px;
+    }
+  }
+  
+  /* Footer */
+  .main-footer {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 10px 20px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+  }
+  
+  /* Input and Form Responsiveness */
+  input[type="text"],
+  select {
+    width: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .form-group {
+      margin-bottom: 15px;
+    }
+  }
+  
