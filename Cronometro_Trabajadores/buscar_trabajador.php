@@ -1,21 +1,38 @@
 <?php
-// buscar_trabajador.php
-include('db.php'); // Incluye tu archivo de conexión a la base de datos
+// Conexión a la base de datos
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "login_system";
 
-$busqueda = isset($_GET['busqueda']) ? $_GET['busqueda'] : '';
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-$sql = "SELECT * FROM trabajadores WHERE nombre LIKE ? OR dni LIKE ? LIMIT 10";
-$stmt = $conn->prepare($sql);
-$busqueda_param = '%' . $busqueda . '%';
-$stmt->bind_param('ss', $busqueda_param, $busqueda_param);
-$stmt->execute();
-$result = $stmt->get_result();
+// Verificar conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        echo "<div>{$row['nombre']} - DNI: {$row['dni']}</div>";
+// Obtener la búsqueda desde el frontend
+$busqueda = $_GET['busqueda'] ?? '';
+
+if (!empty($busqueda)) {
+    // Realizar la consulta para buscar trabajadores por nombre o DNI
+    $sql = "SELECT id, nombre, dni FROM trabajadores WHERE nombre LIKE ? OR dni LIKE ? LIMIT 10";
+    $stmt = $conn->prepare($sql);
+    $likeBusqueda = '%' . $busqueda . '%';
+    $stmt->bind_param('ss', $likeBusqueda, $likeBusqueda);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Mostrar los resultados en la búsqueda
+        while ($row = $result->fetch_assoc()) {
+            echo "<div onclick='seleccionarTrabajador(" . $row['id'] . ", \"" . $row['nombre'] . "\", \"" . $row['dni'] . "\")'>";
+            echo $row['nombre'] . " (" . $row['dni'] . ")";
+            echo "</div>";
+        }
+    } else {
+        echo "No se encontraron resultados.";
     }
-} else {
-    echo "No se encontraron trabajadores.";
 }
 ?>

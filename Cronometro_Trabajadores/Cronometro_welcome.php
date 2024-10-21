@@ -1,5 +1,31 @@
 <?php
+// Conexión a la base de datos
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "login_system";
+
+// Crear conexión
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Verificar conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+
+// Consulta para mostrar trabajadores en receso sin hora de vuelta
+$sql = "SELECT id, nombre, dni, hora_receso, hora_vuelta 
+        FROM trabajadores 
+        WHERE hora_receso IS NOT NULL AND hora_vuelta IS NULL";
+$result = $conn->query($sql);
+
+// Verificar si la consulta devolvió resultados
+if ($result === false) {
+    die("Error en la consulta SQL: " . $conn->error . ". Consulta: " . $sql);
+}
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -17,8 +43,8 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom Styles -->
@@ -315,6 +341,12 @@
             position: relative;
             top: 15px;
         }
+
+        /* Asegurarse de que los estilos sean visualmente claros */
+        .contador {
+            font-weight: bold;
+            font-size: 18px;
+        }
     </style>
 </head>
 
@@ -359,19 +391,19 @@
 
         <!-- Content Wrapper -->
         <div class="content-wrapper">
-        <header class="header">
-        <div class="logo">
-          <img src="../imagenes/logo_dre.png" alt="Logo de la marca">
-          <span class="logo-text">DIRECCION REGIONAL DE EDUCACION HUÁNUCO</span>
-        </div>
-        <nav>
-          <ul class="nav-links">
-            <li><a href="welcome.php">Registrar Visita</a></li>
-            <li><a href="reporte.php">Reporte</a></li>
-            <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
-          </ul>
-        </nav>
-      </header>
+            <header class="header">
+                <div class="logo">
+                    <img src="../imagenes/logo_dre.png" alt="Logo de la marca">
+                    <span class="logo-text">DIRECCION REGIONAL DE EDUCACION HUÁNUCO</span>
+                </div>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="welcome.php">Registrar Visita</a></li>
+                        <li><a href="reporte.php">Reporte</a></li>
+                        <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
+                    </ul>
+                </nav>
+            </header>
 
             <!-- Main container -->
             <section class="content">
@@ -379,29 +411,29 @@
                 <div class="row">
                     <!-- Left section: Search worker -->
                     <div class="left-section">
-                        <div class="search-worker">
+                        <div class="search-worker mb-3">
                             <label for="searchWorker" class="form-label">Buscar Trabajador:</label>
                             <input type="text" id="searchWorker" class="form-control" placeholder="Ingrese el nombre del trabajador" onkeyup="buscarTrabajador()">
                             <div id="searchResult" class="mt-2"></div>
                         </div>
 
-                        <!-- Control de receso del trabajador -->
+                        <!-- Campos ocultos para almacenar el ID del trabajador -->
+                        <input type="hidden" id="worker-id">
+                        <input type="hidden" id="worker-name">
+                        <input type="hidden" id="worker-dni">
+
+                        <!-- Control de receso -->
                         <div id="main-worker" class="worker-box">
-                            <h4 id="worker-name">Nombre del Trabajador</h4> <!-- Aquí se autocompletará el nombre -->
-
+                            <h4 id="worker-name-display">Nombre del Trabajador</h4> <!-- Aquí se autocompletará el nombre -->
                             <div class="search-worker mb-3">
-                                <label for="dniWorker" class="form-label">Ingrese el DNI del Trabajador:</label>
-                                <input type="text" id="dniWorker" class="form-control" placeholder="Ingrese el DNI" maxlength="8" onkeyup="buscarPorDNI()">
-                                <small id="dni-error" style="color:red;"></small> <!-- Mostrar errores si el DNI no es válido -->
+                                <label for="dniWorker" class="form-label">DNI:</label>
+                                <input type="text" id="dniWorker" class="form-control" placeholder="Ingrese el DNI" maxlength="8" readonly>
                             </div>
-
                             <div id="timer-1" class="timer in-time">5:00</div>
                             <div class="btn-group">
-                                <button class="btn btn-success" onclick="iniciarContador(1)">Iniciar Receso</button>
-                                <button class="btn btn-danger" onclick="endBreak(1)" disabled>Finalizar Receso</button>
+                                <button class="btn btn-success" onclick="registrarHora(document.getElementById('worker-id').value, 'receso')">Iniciar Receso</button>
                             </div>
                         </div>
-
                     </div>
 
                     <!-- Right section: Clock -->
@@ -422,42 +454,29 @@
                     </div>
                 </div>
 
-                <!-- Informe de receso -->
+                <!-- Tabla de visitas -->
                 <div class="abajo">
-                    <table id="tblvisita" class="table display table-bordered table-striped dataTable no-footer" role="grid">
+                    <table id="tblvisita" class="table display table-bordered table-striped">
                         <thead class="thead-dark">
-                            <tr role="row">
+                            <tr>
                                 <th>Nro.</th>
                                 <th>Trabajador</th>
                                 <th>Documento</th>
                                 <th>Hora de Receso</th>
                                 <th>Hora de Vuelta</th>
                                 <th>Tiempo (Contador)</th>
-                                <th>Pausar Receso</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            if ($result->num_rows > 0) {
-                                $nro = $offset + 1;
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr id='fila_{$row['id']}'>";
-                                    echo "<td>" . $nro++ . "</td>";
-                                    echo "<td>" . $row['nombre'] . "</td>";
-                                    echo "<td>" . $row['dni'] . "</td>";
-                                    echo "<td>" . (isset($row['hora_receso']) ? $row['hora_receso'] : 'N/A') . "</td>";
-                                    echo "<td>" . (isset($row['hora_vuelta']) ? $row['hora_vuelta'] : 'N/A') . "</td>";
-                                    echo "<td><span id='contador-{$row['id']}'>05:00</span></td>";
-                                    echo "<td><button class='btn btn-success' onclick='pausarReceso({$row['id']})'><i class='material-icons'>pause</i> Pausar</button></td>";
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='7'>No hay datos disponibles</td></tr>";
-                            }
-                            ?>
+                        <tbody id="tbody-visitas">
+                            <tr>
+                                <td colspan="7">No hay datos disponibles</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+
+
 
 
             </section>
@@ -475,38 +494,35 @@
 
 <!-- Script para el cronómetro -->
 <script>
+    function buscarPorDNI() {
+        var dni = document.getElementById("dniWorker").value;
 
-function buscarPorDNI() {
-    var dni = document.getElementById("dniWorker").value;
-    
-    // Validar si el DNI tiene 8 dígitos
-    if (dni.length === 8) {
-        var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Imxvcml0b3gzNDIxQGdtYWlsLmNvbSJ9.WN9y8akxDNlUsWzvwD1Nv7eJGk3qx5Gaaa6VHmjJyf4'; // Reemplazar con tu token
-        
-        // Realizar la consulta a la API
-        fetch(`https://dniruc.apisperu.com/api/v1/dni/${dni}?token=${token}`)
-            .then(response => response.json()) // Convertir a JSON
-            .then(data => {
-                if (data.nombres) {
-                    // Si la respuesta contiene el nombre, actualizar el nombre del trabajador
-                    document.getElementById("worker-name").textContent = `${data.nombres} ${data.apellidoPaterno} ${data.apellidoMaterno}`;
-                    document.getElementById("dni-error").textContent = ""; // Limpiar cualquier error
-                } else {
-                    document.getElementById("worker-name").textContent = "No se encontró el trabajador";
-                    document.getElementById("dni-error").textContent = "DNI no válido o no encontrado.";
-                }
-            })
-            .catch(error => {
-                console.error("Error al consultar el DNI:", error);
-                document.getElementById("dni-error").textContent = "Error en la consulta. Intente nuevamente.";
-            });
-    } else if (dni.length > 0 && dni.length < 8) {
-        document.getElementById("dni-error").textContent = "El DNI debe tener 8 dígitos.";
-    } else {
-        document.getElementById("dni-error").textContent = ""; // Limpiar errores si no hay problemas
+        if (dni.length === 8) {
+            var token = 'tu-token-api-aqui';
+
+            fetch(`https://dniruc.apisperu.com/api/v1/dni/${dni}?token=${token}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.nombres) {
+                        document.getElementById("worker-name").textContent = `${data.nombres} ${data.apellidoPaterno} ${data.apellidoMaterno}`;
+                        document.getElementById("dni-error").textContent = ""; // Limpiar cualquier error
+                    } else {
+                        document.getElementById("worker-name").textContent = "No se encontró el trabajador";
+                        document.getElementById("dni-error").textContent = "DNI no válido o no encontrado.";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al consultar el DNI:", error);
+                    document.getElementById("dni-error").textContent = "Error en la consulta. Intente nuevamente.";
+                });
+        } else if (dni.length > 0 && dni.length < 8) {
+            document.getElementById("dni-error").textContent = "El DNI debe tener 8 dígitos.";
+        } else {
+            document.getElementById("dni-error").textContent = ""; // Limpiar errores si no hay problemas
+        }
     }
-}
 
+    // Buscar trabajadores en tiempo real
     function buscarTrabajador() {
         let query = document.getElementById('searchWorker').value;
         if (query.length > 2) {
@@ -520,8 +536,18 @@ function buscarPorDNI() {
         }
     }
 
+    // Seleccionar trabajador de la búsqueda y autocompletar los campos
+    function seleccionarTrabajador(id, nombre, dni) {
+        // Autocompletar campos ocultos y visibles
+        document.getElementById('worker-id').value = id;
+        document.getElementById('worker-name').value = nombre;
+        document.getElementById('dniWorker').value = dni;
+        document.getElementById('worker-name-display').textContent = nombre;
+        document.getElementById('searchWorker').value = nombre; // Este campo se llena con el nombre del trabajador buscado
+        document.getElementById('searchResult').innerHTML = ''; // Limpiar resultados de búsqueda
+    }
 
-    let timers = {};
+
 
     function iniciarContador(id) {
         let contadorElement = document.getElementById(`contador-${id}`);
@@ -560,11 +586,8 @@ function buscarPorDNI() {
         }, 1000);
     }
 
-
-    // Autocompletar el nombre del trabajador
-
-    // Inicializar reloj en tiempo real
     startClock();
+
 
     let hr = document.querySelector('#hr');
     let mn = document.querySelector('#mn');
@@ -603,6 +626,160 @@ function buscarPorDNI() {
 
     setInterval(updateClock, 1000);
     updateClock(); // Initialize clock immediately
+
+    // Registrar la hora de receso o vuelta
+    function registrarHora(id, tipo) {
+        const url = 'procesar_horas.php';
+        const data = {
+            id: id,
+            tipo: tipo
+        };
+
+        fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    if (tipo === 'receso') {
+                        // Actualizar la tabla con la hora de receso sin eliminar las filas existentes
+                        const workerName = document.getElementById('worker-name').value;
+                        const workerDni = document.getElementById('dniWorker').value;
+                        const newRow = `
+                    <tr id="fila_${id}">
+                        <td>${id}</td>
+                        <td>${workerName}</td>
+                        <td>${workerDni}</td>
+                        <td id="hora_receso_${id}">${result.hora_receso}</td>
+                        <td id="hora_vuelta_${id}">N/A</td>
+                        <td><span id="contador-${id}">05:00</span></td>
+                        <td>
+                            <button class='btn btn-danger' onclick='registrarHora(${id}, "vuelta")'>Pausar Receso</button>
+                        </td>
+                    </tr>`;
+                        document.querySelector("#tblvisita tbody").insertAdjacentHTML('beforeend', newRow);
+                    } else if (tipo === 'vuelta') {
+                        // Actualizar la fila con la hora de vuelta
+                        document.getElementById(`hora_vuelta_${id}`).textContent = result.hora_vuelta;
+
+                        // Opcionalmente, ocultar la fila después de registrar la hora de vuelta
+                        document.getElementById(`fila_${id}`).style.display = 'none';
+                    }
+                } else {
+                    alert('Error al registrar la hora.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al registrar la hora:', error);
+            });
+    }
+
+    // Objeto global para almacenar los intervalos de cada trabajador
+const timers = {};
+
+// Registrar la hora de receso o vuelta
+function registrarHora(id, tipo) {
+    const url = 'procesar_horas.php';
+    const data = { id, tipo };
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                if (tipo === 'receso') {
+                    actualizarTabla(id, result.hora_receso);
+                    iniciarContador(id); // Iniciar el contador al registrar receso
+                } else if (tipo === 'vuelta') {
+                    document.getElementById(`hora_vuelta_${id}`).textContent = result.hora_vuelta;
+                }
+            } else {
+                alert('Error al registrar la hora.');
+            }
+        })
+        .catch(error => console.error('Error al registrar la hora:', error));
+}
+
+// Actualizar la tabla con los datos del receso
+function actualizarTabla(id, horaReceso) {
+    const workerName = document.getElementById('worker-name').value;
+    const workerDni = document.getElementById('dniWorker').value;
+
+    const newRow = `
+        <tr id="fila_${id}">
+            <td>${id}</td>
+            <td>${workerName}</td>
+            <td>${workerDni}</td>
+            <td id="hora_receso_${id}">${horaReceso}</td>
+            <td id="hora_vuelta_${id}">N/A</td>
+            <td><span id="contador-${id}" class="contador">05:00</span></td>
+            <td>
+                <button class='btn btn-danger' onclick='registrarHora(${id}, "vuelta")'>Pausar Receso</button>
+            </td>
+        </tr>`;
+    document.getElementById('tbody-visitas').innerHTML += newRow;
+}
+
+// Iniciar el contador para un trabajador
+function iniciarContador(id) {
+    const contadorElemento = document.getElementById(`contador-${id}`);
+    let tiempoRestante = 5 * 60; // 5 minutos en segundos
+
+    // Limpiar cualquier intervalo anterior
+    if (timers[id]) {
+        clearInterval(timers[id]);
+    }
+
+    // Iniciar un nuevo intervalo
+    timers[id] = setInterval(() => {
+        const minutos = Math.floor(tiempoRestante / 60);
+        const segundos = tiempoRestante % 60 < 10 ? `0${tiempoRestante % 60}` : tiempoRestante % 60;
+
+        contadorElemento.textContent = `${minutos}:${segundos}`;
+
+        // Cambiar color según tiempo restante
+        if (tiempoRestante >= 0) {
+            contadorElemento.style.backgroundColor = 'lightgreen';
+        } else {
+            contadorElemento.style.backgroundColor = 'red';
+        }
+
+        tiempoRestante--;
+
+        if (tiempoRestante < -1) {
+            clearInterval(timers[id]);
+            contadorElemento.textContent = "Tiempo terminado";
+        }
+    }, 1000);
+}
+
+// Pausar el receso y mostrar un popup si se excede el tiempo
+function pausarReceso(id) {
+    const contadorElemento = document.getElementById(`contador-${id}`);
+
+    if (timers[id]) {
+        clearInterval(timers[id]);
+        delete timers[id];
+    }
+
+    const [minutos, segundos] = contadorElemento.textContent.split(':').map(Number);
+    const tiempoRestante = minutos * 60 + segundos;
+
+    if (tiempoRestante < 0) {
+        const tiempoPasado = Math.abs(tiempoRestante);
+        const minutosPasados = Math.floor(tiempoPasado / 60);
+        const segundosPasados = tiempoPasado % 60 < 10 ? `0${tiempoPasado % 60}` : tiempoPasado % 60;
+
+        alert(`El receso se ha pasado por ${minutosPasados}:${segundosPasados} minutos.`);
+    }
+}
 </script>
 
 
