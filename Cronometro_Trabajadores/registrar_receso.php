@@ -1,4 +1,7 @@
 <?php
+// Establecer la zona horaria a la de Perú
+date_default_timezone_set('America/Lima');
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Conexión a la base de datos
     $conn = new mysqli("localhost", "root", "", "login_system");
@@ -20,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Procesar la acción recibida ('start' para inicio de receso, 'end' para finalizarlo)
     if ($action === 'start') {
-        // Registrar la hora de inicio del receso
+        // Registrar la hora de inicio del receso en la zona horaria de Perú
         $sql = "INSERT INTO recesos (worker_id, inicio) VALUES (?, NOW())";
     } elseif ($action === 'end') {
         // Registrar la hora de fin del receso (solo si está abierto, es decir, fin IS NULL)
