@@ -345,25 +345,19 @@ if ($result === false) {
 
         /* Asegurarse de que los estilos sean visualmente claros */
         .contador {
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .alert-green {
-            background-color: #28a745;
-        }
-
-        .alert-red {
-            background-color: #dc3545;
-        }
-
-        .contador-activo {
-            background-color: #4CAF50;
-            /* Fondo verde */
+            padding: 10px;
             color: white;
-            /* Texto blanco */
-            padding: 5px;
+            font-weight: bold;
             border-radius: 5px;
+            text-align: center;
+        }
+
+        .contador-verde {
+            background-color: green;
+        }
+
+        .contador-rojo {
+            background-color: red;
         }
     </style>
 </head>
@@ -380,10 +374,17 @@ if ($result === false) {
                 </div>
             </a>
 
-            <!-- Sidebar Menu -->
+
+            <!-- Sidebar -->
             <div class="sidebar">
+                <!-- User Panel -->
+
+                <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Principal -->
+
+                        <!-- Registro de visitas -->
                         <li class="nav-item">
                             <a href="../welcome.php" class="nav-link">
                                 <i class="material-icons">person_add</i>
@@ -397,7 +398,7 @@ if ($result === false) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="Cronometro_welcome.php" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="material-icons">access_time</i>
                                 <p>Cronometro</p>
                             </a>
@@ -443,7 +444,6 @@ if ($result === false) {
                         <!-- Control de receso -->
                         <div id="main-worker" class="worker-box">
                             <h4 id="worker-name-display">Nombre del Trabajador</h4>
-                            <!-- Aquí se autocompletará el nombre -->
                             <div class="search-worker mb-3">
                                 <label for="dniWorker" class="form-label">DNI:</label>
                                 <input type="text" id="dniWorker" class="form-control" placeholder="Ingrese el DNI" maxlength="8" readonly>
@@ -461,18 +461,14 @@ if ($result === false) {
                                 </select>
                             </div>
                             <div class="btn-group">
-                                <button class="btn btn-success" onclick="registrarHora(document.getElementById('worker-id').value, 'receso')">Iniciar Receso</button>
+                                <button class="btn btn-success" onclick="registrarReceso()">Iniciar Receso</button>
                             </div>
                         </div>
-
                     </div>
 
-                    <!-- Right section: Clock -->
+                    <!-- Right section: Digital Clock -->
                     <div class="right-section">
                         <div class="clock-container">
-                            <!-- Reloj Analógico -->
-
-                            <!-- Reloj Digital -->
                             <div class="digital-clock">
                                 <div class="time">
                                     <span class="hour">00</span> :
@@ -485,7 +481,7 @@ if ($result === false) {
                     </div>
                 </div>
 
-                <!-- Tabla de visitas -->
+                <!-- Tabla de recesos -->
                 <div class="abajo">
                     <table id="tblvisita" class="table display table-bordered table-striped">
                         <thead class="thead-dark">
@@ -495,7 +491,7 @@ if ($result === false) {
                                 <th>Documento</th>
                                 <th>Hora de Receso</th>
                                 <th>Hora de Vuelta</th>
-                                <th>Tiempo (Contador)</th>
+                                <th>Duración</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -507,185 +503,157 @@ if ($result === false) {
                     </table>
                 </div>
             </section>
-            <!-- Footer -->
         </div>
-        <div id="alerta-flotante" class="alerta" style="
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1050;
-    padding: 15px;
-    border-radius: 5px;
-    display: none;
-    font-weight: bold;
-    color: white;
-    background-color: grey;
-    transition: all 0.5s ease;">
-        </div>
-</body>
-<!-- Script para el cronómetro -->
-<script>
-    // Buscar trabajadores en tiempo real
-    function buscarTrabajador() {
-        let query = document.getElementById('searchWorker').value;
-        if (query.length > 2) {
-            fetch(`buscar_trabajador.php?busqueda=${query}`)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('searchResult').innerHTML = data;
-                });
-        } else {
-            document.getElementById('searchResult').innerHTML = '';
-        }
-    }
 
-    // Seleccionar trabajador de la búsqueda y autocompletar los campos
-    function seleccionarTrabajador(id, nombre, dni) {
-        document.getElementById('worker-id').value = id;
-        document.getElementById('worker-name').value = nombre;
-        document.getElementById('dniWorker').value = dni;
-        document.getElementById('worker-name-display').textContent = nombre;
-        document.getElementById('searchWorker').value = nombre;
-        document.getElementById('searchResult').innerHTML = ''; // Limpiar resultados de búsqueda
-    }
+        <div id="alerta-flotante" class="alerta" style="display:none;"></div>
+    </div>
 
-    // WeakMap para almacenar los temporizadores de cada trabajador
-const workerTimers = new WeakMap();
+    <script>
+        // Objeto para almacenar los recesos activos
+        let recesosActivos = {};
+        let numeroFila = 1;
 
-function iniciarContador(id, duracionMinutos) {
-    const contadorElement = document.getElementById(`contador-${id}`);
-    let tiempoRestante = duracionMinutos * 60; // Convertimos minutos a segundos
+        // Registrar receso y generar fila en la tabla
+        function registrarReceso() {
+            const id = document.getElementById('worker-id').value;
+            const nombre = document.getElementById('worker-name').value;
+            const dni = document.getElementById('dniWorker').value;
+            const duracion = document.getElementById('recesoDuration').value;
 
-    // Limpiar el intervalo anterior si ya existe para este elemento
-    if (workerTimers.has(contadorElement)) {
-        clearInterval(workerTimers.get(contadorElement));
-    }
-
-    // Crear un nuevo intervalo para este trabajador
-    const timerId = setInterval(() => {
-        let minutos = Math.floor(tiempoRestante / 60);
-        let segundos = tiempoRestante % 60;
-        contadorElement.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-        tiempoRestante--;
-
-        if (tiempoRestante < 0) {
-            clearInterval(timerId); // Detener el intervalo cuando el tiempo se acabe
-            contadorElement.textContent = "Tiempo terminado";
-            contadorElement.classList.remove('contador-activo'); // Eliminar la clase al finalizar
-        }
-    }, 1000); // Actualizar cada segundo
-
-    // Asociar este temporizador al contadorElement en el WeakMap
-    workerTimers.set(contadorElement, timerId);
-}
-
-// Registrar la hora de receso o vuelta
-function registrarHora(id, tipo) {
-    const recesoDuration = tipo === 'receso' ? document.getElementById('recesoDuration').value : null;
-    const url = 'procesar_horas.php';
-    const data = {
-        id: id,
-        tipo: tipo,
-        duracion: recesoDuration
-    };
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.success) {
-            if (tipo === 'receso') {
-                actualizarTabla(id, result.hora_receso, recesoDuration);
-                iniciarContador(id, recesoDuration); // Iniciar el contador con la duración seleccionada
-            } else if (tipo === 'vuelta') {
-                actualizarHoraVuelta(id, result.hora_vuelta);
-                ocultarFila(id); // Ocultar fila si la hora de vuelta se registró
+            if (!id || !nombre || !dni || !duracion) {
+                alert("Por favor, complete todos los campos antes de iniciar el receso.");
+                return;
             }
-        } else {
-            mostrarModal('Error al registrar la hora.');
+
+            // Obtener la hora actual
+            const ahora = new Date();
+            const horaReceso = ahora.toLocaleTimeString('es-ES');
+
+            // Crear la fila en la tabla
+            const newRow = `
+        <tr id="fila_${id}">
+            <td>${numeroFila++}</td>
+            <td>${nombre}</td>
+            <td>${dni}</td>
+            <td>${horaReceso}</td>
+            <td>N/A</td>
+            <td>
+                <span id="contador-${id}" class="contador contador-verde">${duracion}:00</span>
+            </td>
+            <td>
+                <button class='btn btn-danger' onclick='finalizarReceso(${id})'>Pausar Receso</button>
+            </td>
+        </tr>`;
+
+            document.getElementById('tbody-visitas').insertAdjacentHTML('beforeend', newRow);
+
+            // Iniciar el contador para este trabajador
+            iniciarContador(id, duracion * 60); // Convertir minutos a segundos
         }
-    })
-    .catch(error => console.error('Error al registrar la hora:', error));
-}
 
-// Actualizar la tabla con la hora de receso
-function actualizarTabla(id, horaReceso, duracionMinutos) {
-    const workerName = document.getElementById('worker-name').value;
-    const workerDni = document.getElementById('dniWorker').value;
+        // Finalizar el receso y actualizar la tabla
+        function finalizarReceso(id) {
+            if (!recesosActivos[id]) {
+                alert("No se encontró un receso activo para este trabajador.");
+                return;
+            }
 
-    const newRow = `
-    <tr id="fila_${id}">
-        <td>${id}</td>
-        <td>${workerName}</td>
-        <td>${workerDni}</td>
-        <td id="hora_receso_${id}">${horaReceso}</td>
-        <td id="hora_vuelta_${id}">N/A</td>
-        <td><span id="contador-${id}" class="contador">${duracionMinutos}:00</span></td>
-        <td>
-            <button class='btn btn-danger' onclick='registrarHora(${id}, "vuelta")'>Pausar Receso</button>
-        </td>
-    </tr>`;
-    document.getElementById('tbody-visitas').innerHTML += newRow;
-}
+            const ahora = new Date();
+            const horaVuelta = ahora.toLocaleTimeString('es-ES');
 
-// Actualizar la hora de vuelta en la tabla
-function actualizarHoraVuelta(id, horaVuelta) {
-    document.getElementById(`hora_vuelta_${id}`).textContent = horaVuelta;
-}
+            // Actualizar la fila correspondiente
+            const fila = document.getElementById(`fila_${id}`);
+            if (fila) {
+                fila.cells[4].textContent = horaVuelta;
+            }
 
-// Mostrar un modal con un mensaje
-function mostrarModal(mensaje) {
-    const mensajeElemento = document.getElementById('mensajeTiempo');
-    mensajeElemento.textContent = mensaje;
-    const modal = new bootstrap.Modal(document.getElementById('modalTiempo'));
-    modal.show();
-}
+            // Remover la fila de la tabla tras un breve retraso (opcional)
+            setTimeout(() => {
+                fila.remove();
+            }, 1000);
 
-// Ocultar la fila después de registrar la vuelta
-function ocultarFila(id) {
-    const fila = document.getElementById(`fila_${id}`);
-    if (fila) {
-        setTimeout(() => {
-            fila.remove();
-        }, 1000);
-    }
-}
-    // Actualizar el reloj digital cada segundo
-    function actualizarRelojDigital() {
-        const reloj = document.querySelector('.digital-clock .time');
-        const horasElemento = reloj.querySelector('.hour');
-        const minutosElemento = reloj.querySelector('.minute');
-        const segundosElemento = reloj.querySelector('.second');
-        const ampmElemento = reloj.querySelector('.ampm');
+            // Limpiar el receso del objeto
+            delete recesosActivos[id];
+        }
 
-        const ahora = new Date();
-        let horas = ahora.getHours();
-        let minutos = ahora.getMinutes();
-        let segundos = ahora.getSeconds();
-        const ampm = horas >= 12 ? 'PM' : 'AM';
+        // Función para iniciar el contador
+        function iniciarContador(id, tiempoRestante) {
+            const contadorElemento = document.getElementById(`contador-${id}`);
 
-        horas = horas % 12;
-        horas = horas ? horas : 12; // El "0" se convierte en "12"
-        horas = horas < 10 ? '0' + horas : horas;
-        minutos = minutos < 10 ? '0' + minutos : minutos;
-        segundos = segundos < 10 ? '0' + segundos : segundos;
+            const intervalo = setInterval(() => {
+                let minutos = Math.floor(tiempoRestante / 60);
+                let segundos = tiempoRestante % 60;
 
-        horasElemento.textContent = horas;
-        minutosElemento.textContent = minutos;
-        segundosElemento.textContent = segundos;
-        ampmElemento.textContent = ampm;
-    }
+                if (segundos < 10) segundos = "0" + segundos;
+                if (minutos < 10) minutos = "0" + minutos;
 
-    setInterval(actualizarRelojDigital, 1000);
-    actualizarRelojDigital();
-</script>
+                contadorElemento.textContent = `${minutos}:${segundos}`;
 
+                if (tiempoRestante > 0) {
+                    tiempoRestante--;
+                } else {
+                    // Cambiar a contador rojo
+                    contadorElemento.classList.remove('contador-verde');
+                    contadorElemento.classList.add('contador-rojo');
+                    tiempoRestante--; // Empieza a contar en rojo el tiempo extra
+                }
+            }, 1000);
 
+            recesosActivos[id] = intervalo;
+        }
 
+        // Función para mostrar el reloj digital
+        function actualizarRelojDigital() {
+            const reloj = document.querySelector('.digital-clock .time');
+            const horasElemento = reloj.querySelector('.hour');
+            const minutosElemento = reloj.querySelector('.minute');
+            const segundosElemento = reloj.querySelector('.second');
+            const ampmElemento = reloj.querySelector('.ampm');
+
+            const ahora = new Date();
+            let horas = ahora.getHours();
+            let minutos = ahora.getMinutes();
+            let segundos = ahora.getSeconds();
+            const ampm = horas >= 12 ? 'PM' : 'AM';
+
+            horas = horas % 12;
+            horas = horas ? horas : 12; // El "0" se convierte en "12"
+            horas = horas < 10 ? '0' + horas : horas;
+            minutos = minutos < 10 ? '0' + minutos : minutos;
+            segundos = segundos < 10 ? '0' + segundos : segundos;
+
+            horasElemento.textContent = horas;
+            minutosElemento.textContent = minutos;
+            segundosElemento.textContent = segundos;
+            ampmElemento.textContent = ampm;
+        }
+
+        setInterval(actualizarRelojDigital, 1000);
+        actualizarRelojDigital();
+        // Buscar trabajadores en tiempo real
+        function buscarTrabajador() {
+            let query = document.getElementById('searchWorker').value;
+            if (query.length > 2) {
+                fetch(`buscar_trabajador.php?busqueda=${query}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('searchResult').innerHTML = data;
+                    });
+            } else {
+                document.getElementById('searchResult').innerHTML = '';
+            }
+        }
+
+        // Seleccionar trabajador de la búsqueda y autocompletar los campos
+        function seleccionarTrabajador(id, nombre, dni) {
+            document.getElementById('worker-id').value = id;
+            document.getElementById('worker-name').value = nombre;
+            document.getElementById('dniWorker').value = dni;
+            document.getElementById('worker-name-display').textContent = nombre;
+            document.getElementById('searchWorker').value = nombre;
+            document.getElementById('searchResult').innerHTML = ''; // Limpiar resultados de búsqueda
+        }
+    </script>
+</body>
 
 </html>
