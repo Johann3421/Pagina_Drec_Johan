@@ -1,11 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;800&display=swap');
 
-/* Asegúrate de que los estilos generales no afecten al header */
-
-
-
-/* Estilos del Header */
+body {
+    background-color: #f4f6f9;
+    font-family: 'Source Sans Pro', sans-serif;
+}
 
 .header {
     background-color: #00aeff;
@@ -33,7 +30,7 @@
     /* Tamaño más grande para el logo */
     width: auto;
     transition: all 0.3s;
-    margin-left: -10%;
+    margin-left: -30%;
 }
 
 .header .logo img:hover {
@@ -77,7 +74,7 @@
     color: #ffbc0e;
 }
 
-.header .btn button {
+.header .btn-1 button {
     margin-left: 20px;
     font-weight: 700;
     color: #1b3039;
@@ -89,110 +86,153 @@
     transition: all 0.3s ease 0s;
 }
 
-.header .btn button:hover {
+.header .btn-1 button:hover {
     background-color: #e2f1f8;
     color: #ffbc0e;
     transform: scale(1.1);
 }
 
+.nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-links li {
+    list-style: none;
+}
+
+.nav-links li a {
+    color: white;
+    text-decoration: none;
+}
+
+.btn {
+    background-color: white;
+    color: #1367C8;
+    border-radius: 4px;
+    padding: 5px 15px;
+}
+
+/* Layout for main content */
 
 
+/* Flexbox for the left and right sections */
+.row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.left-section,
+.right-section {
+    width: 48%;
+    margin-bottom: 20px;
+}
+
+.search-worker {
+    margin-bottom: 40px;
+}
+
+#searchWorker {
+    width: 100%;
+}
+
+#searchResult div {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+
+#searchResult div:hover {
+    background-color: #ddd;
+}
+
+/* Clock section styling */
+.clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 .clock {
     position: relative;
-    width: 450px;
-    height: 450px;
-    background: #2f363e;
+    width: 250px;
+    height: 250px;
+    margin-bottom: 20px;
+}
+
+.clock .circle {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
     border-radius: 50%;
-    box-shadow: 10px 50px 70px rgba(0, 0, 0, 0.25);
-    inset: 5px 5px 10px rgba(0, 0, 0, 0.5);
-    inset: 5px 5px 20px rgba(0, 0, 0, 0.2);
-    inset: 5px 5px 15px rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 30px;
 }
 
-.clock::before {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #2f363e;
-    border: 3px solid #fff;
-    border-radius: 50%;
-    z-index: 100000;
+.digital-clock {
+    font-size: 24px;
 }
 
-.clock span {
-    position: absolute;
-    inset: 20px;
-    color: #fff;
+.digital-clock .time {
+    font-weight: bold;
+}
+
+/* Break timer box */
+.worker-box {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+}
+
+.worker-box h4 {
     text-align: center;
-    transform: rotate(calc(30deg * var(--i)));
-    /*360 / 12=30deg*/
+    font-weight: bold;
+    color: #1367C8;
 }
 
-.clock span b {
-    font-size: 2em;
-    opacity: 0.25;
-    font-weight: 600;
-    display: inline-block;
-    transform: rotate(calc(-30deg * var(--i)));
+.timer {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
 }
 
-.circle {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border: 2px solid rgba(0, 0, 0, 0.25);
-    border-radius: 50%;
+.btn-group {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    z-index: 10;
+    gap: 10px;
 }
 
-.circle i {
-    position: absolute;
-    width: 6px;
-    height: 50%;
-    background: var(--clr);
-    opacity: 0.75;
-    transform-origin: bottom;
-    transform: scaleY(0.5);
+/* Informe section styling */
+.report-box {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
 }
 
-.circle:nth-child(1) i {
-    width: 2px;
+.report-box h4 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.circle:nth-child(2) i {
-    width: 6px;
-}
+/* Mobile responsiveness */
+@media (max-width: 768px) {
 
-.circle2 {
-    width: 240px;
-    height: 240px;
-    z-index: 9;
-}
-
-.circle3 {
-    width: 180px;
-    height: 180px;
-    z-index: 8;
-}
-
-.circle::before {
-    content: '';
-    position: absolute;
-    top: -8.5;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: var(--clr);
-    box-shadow: 0 0 20px var(--clr), 0 0 60px var(--clr);
+    .left-section,
+    .right-section {
+        width: 100%;
+        margin-bottom: 20px;
+    }
 }
 
 .digital-clock {
@@ -250,4 +290,21 @@
     font-size: 20px;
     position: relative;
     top: 15px;
+}
+
+/* Asegurarse de que los estilos sean visualmente claros */
+.contador {
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.contador-verde {
+    background-color: green;
+}
+
+.contador-rojo {
+    background-color: red;
 }

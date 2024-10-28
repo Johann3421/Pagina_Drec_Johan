@@ -75,9 +75,6 @@ $total_filas = $result_total->fetch_assoc()['total'];
 $total_paginas = ceil($total_filas / $limite);
 
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -94,25 +91,7 @@ $total_paginas = ceil($total_filas / $limite);
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
-
-  <style>
-    .arriba1 {
-      float: right;
-      margin-left: 0;
-      margin-bottom: 5px;
-      display: block;
-      margin-right: 5px;
-    }
-
-    .btn-group {
-      display: block !important;
-    }
-
-    .head-modal {
-      background-color: #1367C8;
-      color: white;
-    }
-  </style>
+  <script src="script.js"></script>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -319,41 +298,6 @@ $total_paginas = ceil($total_filas / $limite);
 
         <!-- JavaScript para manejar el filtrado por fecha -->
         <script>
-          document.getElementById('filtrar-fecha-btn').addEventListener('click', function() {
-            var fechaDesde = document.getElementById('fecha-desde').value;
-            var fechaHasta = document.getElementById('fecha-hasta').value;
-
-            if (fechaDesde && fechaHasta) {
-              // Redirigir con parámetros de fecha
-              window.location.href = "?desde=" + fechaDesde + "&hasta=" + fechaHasta;
-            } else {
-              alert("Por favor, selecciona ambas fechas.");
-            }
-          });
-        </script>
-
-
-        <!-- JavaScript para manejar el filtrado por fecha -->
-        <script>
-          document.getElementById('filtrar-fecha-btn').addEventListener('click', function() {
-            var fechaDesde = document.getElementById('fecha-desde').value;
-            var fechaHasta = document.getElementById('fecha-hasta').value;
-
-            if (fechaDesde && fechaHasta) {
-              // Redirigir con parámetros de fecha
-              window.location.href = "?desde=" + fechaDesde + "&hasta=" + fechaHasta;
-            } else {
-              alert("Por favor, selecciona ambas fechas.");
-            }
-          });
-        </script>
-
-
-
-        <script>
-          function imprimirTicket(id) {
-            window.location.href = "imprimir_ticket.php?id=" + id;
-          }
           document.getElementById('filtrar-fecha-btn').addEventListener('click', function() {
             var fechaDesde = document.getElementById('fecha-desde').value;
             var fechaHasta = document.getElementById('fecha-hasta').value;

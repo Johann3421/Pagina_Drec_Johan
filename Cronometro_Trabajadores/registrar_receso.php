@@ -1,54 +1,42 @@
 <?php
-// Establecer la zona horaria a la de Perú
 date_default_timezone_set('America/Lima');
+// Configuración de conexión a la base de datos
+$dsn = "mysql:host=localhost;dbname=login_system;charset=utf8mb4";
+$options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+];
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Conexión a la base de datos
-    $conn = new mysqli("localhost", "root", "", "login_system");
+try {
+    $conn = new PDO($dsn, "root", "", $options);
+} catch (PDOException $e) {
+    die("Conexión fallida: " . $e->getMessage());
+}
 
-    if ($conn->connect_error) {
-        die(json_encode(['success' => false, 'message' => 'Conexión fallida: ' . $conn->connect_error]));
-    }
+// Verificar si los datos han sido enviados correctamente
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['duracion'])) {
+    $worker_id = $_POST['id'];
+    $duracion = $_POST['duracion'];
+    $hora_receso = date('Y-m-d H:i:s'); // Hora actual en formato de base de datos
 
-    // Recibir datos de la solicitud POST
-    $workerId = $_POST['workerId'] ?? null;
-    $action = $_POST['action'] ?? null;
+    // Actualizar la tabla `trabajadores` con la `hora_receso` y la `duracion`
+    $stmt = $conn->prepare("UPDATE trabajadores SET hora_receso = :hora_receso, duracion = :duracion, hora_vuelta = NULL WHERE id = :id");
+    $stmt->execute([
+        ':hora_receso' => $hora_receso,
+        ':duracion' => $duracion,
+        ':id' => $worker_id
+    ]);
 
-    // Verificar que los parámetros requeridos existen
-    if (!$workerId || !$action) {
-        echo json_encode(['success' => false, 'message' => 'Parámetros inválidos']);
-        $conn->close();
-        exit;
-    }
-
-    // Procesar la acción recibida ('start' para inicio de receso, 'end' para finalizarlo)
-    if ($action === 'start') {
-        // Registrar la hora de inicio del receso en la zona horaria de Perú
-        $sql = "INSERT INTO recesos (worker_id, inicio) VALUES (?, NOW())";
-    } elseif ($action === 'end') {
-        // Registrar la hora de fin del receso (solo si está abierto, es decir, fin IS NULL)
-        $sql = "UPDATE recesos SET fin = NOW() WHERE worker_id = ? AND fin IS NULL";
+    // Verificar si se actualizó algún registro
+    if ($stmt->rowCount()) {
+        // Enviar respuesta JSON con éxito y la hora de inicio del receso
+        echo json_encode(['status' => 'success', 'hora_receso' => $hora_receso, 'duracion' => $duracion]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Acción no válida']);
-        $conn->close();
-        exit;
+        // Enviar respuesta JSON con error si no se actualizó ningún registro
+        echo json_encode(['status' => 'error', 'message' => 'No se pudo registrar el receso.']);
     }
-
-    // Preparar y ejecutar la consulta
-    $stmt = $conn->prepare($sql);
-    if ($stmt) {
-        $stmt->bind_param('i', $workerId);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Receso registrado correctamente']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error al registrar el receso']);
-        }
-        $stmt->close();
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Error en la preparación de la consulta']);
-    }
-
-    // Cerrar la conexión
-    $conn->close();
+} else {
+    // Error si faltan datos
+    echo json_encode(['status' => 'error', 'message' => 'Datos incompletos.']);
 }
 ?>

@@ -113,3 +113,19 @@
     transform: scale(1.05); /* Destaca el botón seleccionado */
   }
   /* General Styles */
+  .arriba1 {
+    float: right;
+    margin-left: 0;
+    margin-bottom: 5px;
+    display: block;
+    margin-right: 5px;
+  }
+
+  .btn-group {
+    display: block !important;
+  }
+
+  .head-modal {
+    background-color: #1367C8;
+    color: white;
+  }
