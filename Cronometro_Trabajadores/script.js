@@ -1,8 +1,6 @@
 let recesosActivos = {};
 let numeroFila = 1;
 
-// Registrar receso y generar fila en la tabla
-// Registrar receso y generar fila en la tabla
 function registrarReceso() {
     const id = document.getElementById('worker-id').value;
     const nombre = document.getElementById('worker-name').value;
@@ -14,7 +12,7 @@ function registrarReceso() {
         return;
     }
 
-    // Enviar los datos al servidor para insertar la hora de receso
+    // Enviar datos al servidor para registrar el receso
     fetch('registrar_receso.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -28,27 +26,29 @@ function registrarReceso() {
         if (data.status === 'success') {
             const horaReceso = data.hora_receso;
 
-            // Guardar los datos en localStorage
-            localStorage.setItem(`receso_${id}`, JSON.stringify({ horaReceso, duracion }));
-
-            // Código para añadir la nueva fila en la tabla
+            // Insertar una nueva fila en la tabla
             const newRow = `
-            <tr id="fila_${id}">
-                <td>${numeroFila++}</td>
-                <td>${nombre}</td>
-                <td>${dni}</td>
-                <td>${horaReceso}</td>
-                <td>N/A</td>
-                <td>
-                    <span id="contador-${id}" class="contador contador-verde">${duracion}:00</span>
-                </td>
-                <td>
-                    <button class='btn btn-danger' onclick='finalizarReceso(${id})'>Pausar Receso</button>
-                </td>
-            </tr>`;
+                <tr id="fila_${id}">
+                    <td>${document.querySelectorAll('#tbody-visitas tr').length + 1}</td>
+                    <td>${nombre}</td>
+                    <td>${dni}</td>
+                    <td>${horaReceso}</td>
+                    <td>N/A</td>
+                    <td>
+                        <span id="contador-${id}" class="contador contador-verde">${duracion}:00</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" onclick="finalizarReceso(${id})">Pausar Receso</button>
+                    </td>
+                </tr>`;
 
+            // Agregar la nueva fila al DOM y eliminar el mensaje "No hay datos"
             document.getElementById('tbody-visitas').insertAdjacentHTML('beforeend', newRow);
-            iniciarContador(id, horaReceso, duracion); // Iniciar el contador en base a horaReceso y duracion
+            const noDataRow = document.querySelector('#tbody-visitas .no-data');
+            if (noDataRow) noDataRow.remove();
+
+            // Iniciar el contador para la nueva fila
+            iniciarContador(id, horaReceso, duracion);
         } else {
             alert(data.message || "Hubo un error al registrar el receso.");
         }
@@ -56,17 +56,17 @@ function registrarReceso() {
     .catch(error => console.error('Error:', error));
 }
 
+
+
 // Finalizar el receso y actualizar la tabla
 function finalizarReceso(id) {
     const contadorElemento = document.getElementById(`contador-${id}`);
-
-    // Comprobar si el contador ha llegado a 0 o si está activo
-    if (contadorElemento.textContent === "00:00") {
-        alert("El tiempo de receso ya ha terminado para este trabajador.");
+    
+    if (!contadorElemento || contadorElemento.textContent === "00:00") {
+        alert("El tiempo de receso ya ha terminado o no está activo.");
         return;
     }
 
-    // Enviar el ID del trabajador al servidor para registrar la hora de vuelta
     fetch('finalizar_receso.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -80,15 +80,15 @@ function finalizarReceso(id) {
             // Actualizar la fila correspondiente con la hora de vuelta
             const fila = document.getElementById(`fila_${id}`);
             if (fila) {
-                fila.cells[4].textContent = horaVuelta; // Columna de hora de vuelta
+                fila.cells[4].textContent = horaVuelta;
             }
 
             // Limpiar el intervalo del contador y eliminarlo del objeto de recesos activos
             clearInterval(recesosActivos[id]);
             delete recesosActivos[id];
-
-            // Remover la fila de la tabla tras un breve retraso (opcional)
-            setTimeout(() => fila.remove(), 1000);
+            contadorElemento.textContent = "00:00";
+            localStorage.removeItem(`receso_${id}`); // Limpiar el receso en localStorage
+            setTimeout(() => fila.remove(), 1000); // Opcional: remover la fila después
         } else {
             alert(data.message || "Hubo un error al finalizar el receso.");
         }
@@ -97,37 +97,50 @@ function finalizarReceso(id) {
 }
 
 
-// Función para iniciar el contador
-function iniciarContador(id, horaReceso, duracionMinutos) {
-    const contadorElemento = document.getElementById(`contador-${id}`);
 
-    // Revisar si el receso está en localStorage
-    const recesoGuardado = JSON.parse(localStorage.getItem(`receso_${id}`));
-    if (recesoGuardado) {
-        horaReceso = recesoGuardado.horaReceso;
-        duracionMinutos = recesoGuardado.duracion;
+// Función para cargar y mostrar contadores en base al tiempo restante del servidor
+function iniciarContadores() {
+    // Consultar el tiempo restante de todos los recesos activos desde el servidor
+    fetch('calcular_tiempo_restante.php', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Para cada trabajador con receso activo, iniciamos el contador
+            data.trabajadores.forEach(trabajador => {
+                iniciarContador(trabajador.id, trabajador.tiempo_restante);
+            });
+        } else {
+            console.error("Error al obtener los tiempos restantes:", data.message);
+        }
+    })
+    .catch(error => console.error('Error en la solicitud de tiempos restantes:', error));
+}
+
+// Función para iniciar un contador individual con un tiempo restante específico
+function iniciarContador(id, tiempoRestante) {
+    const contadorElemento = document.getElementById(`contador-${id}`);
+    
+    if (!contadorElemento) {
+        console.error(`Elemento contador-${id} no encontrado.`);
+        return;
     }
 
-    // Convertir la hora de receso a objeto Date y calcular la hora de finalización
-    const inicioReceso = new Date(horaReceso);
-    const finReceso = new Date(inicioReceso.getTime() + duracionMinutos * 60000);
-
-    // Iniciar el intervalo para actualizar el contador
-    recesosActivos[id] = setInterval(() => {
-        const ahora = new Date();
-        const tiempoRestante = Math.floor((finReceso - ahora) / 1000); // Tiempo restante en segundos
-
+    // Iniciar intervalo para actualizar el contador cada segundo
+    const intervalo = setInterval(() => {
         if (tiempoRestante > 0) {
             const minutos = Math.floor(tiempoRestante / 60);
             const segundos = tiempoRestante % 60;
             contadorElemento.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+            tiempoRestante--;
         } else {
-            // Cambiar el contador a rojo cuando el tiempo de receso ha terminado
+            // Cambiar a rojo cuando el tiempo se agote
             contadorElemento.classList.remove('contador-verde');
             contadorElemento.classList.add('contador-rojo');
-            clearInterval(recesosActivos[id]);
             contadorElemento.textContent = "00:00";
-            localStorage.removeItem(`receso_${id}`); // Limpiar el receso del almacenamiento
+            clearInterval(intervalo);
         }
     }, 1000);
 }

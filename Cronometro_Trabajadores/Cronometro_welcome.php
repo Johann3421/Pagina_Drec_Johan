@@ -1,5 +1,5 @@
 <?php
-// config/db.php - Archivo de configuración de la conexión
+// Conexión a la base de datos
 $dsn = "mysql:host=localhost;dbname=login_system;charset=utf8mb4";
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -12,12 +12,11 @@ try {
     die("Conexión fallida: " . $e->getMessage());
 }
 
-// Consulta trabajadores en receso sin hora de vuelta
-$stmt = $conn->prepare("SELECT id, nombre, dni, hora_receso, hora_vuelta 
+// Consulta para obtener trabajadores en receso activo con duración del receso
+$stmt = $conn->prepare("SELECT id, nombre, dni, hora_receso, hora_vuelta, duracion 
                         FROM trabajadores 
                         WHERE hora_receso IS NOT NULL AND hora_vuelta IS NULL");
 $stmt->execute();
-
 $trabajadores = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -27,38 +26,27 @@ $trabajadores = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Receso de Trabajadores</title>
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body onload="iniciarContadores()" class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
             <a href="/" class="brand-link">
                 <div class="logo">
                     <img src="../imagenes/logo_dre.png" alt="Logo de la marca" class="brand-image img-circle elevation-3">
                     <span class="brand-text font-weight-light">DRE-HUÁNUCO</span>
                 </div>
             </a>
-            <!-- Sidebar -->
             <div class="sidebar">
-                <!-- User Panel -->
-                <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Principal -->
-                        <!-- Registro de visitas -->
                         <li class="nav-item">
                             <a href="../welcome.php" class="nav-link">
                                 <i class="material-icons">person_add</i>
@@ -81,44 +69,34 @@ $trabajadores = $stmt->fetchAll();
                 </nav>
             </div>
         </aside>
-        <!-- Content Wrapper -->
+
         <div class="content-wrapper">
             <header class="header">
                 <div class="logo">
                     <img src="../imagenes/logo_dre.png" alt="Logo de la marca">
                     <span class="logo-text">DIRECCION REGIONAL DE EDUCACION HUÁNUCO</span>
                 </div>
-                <nav>
-                    <ul class="nav-links">
-                        <li><a href="../welcome.php">Registrar Visita</a></li>
-                        <li><a href="../reporte.php">Reporte</a></li>
-                        <li><a href="#">Cronometro</a></li>
-                    </ul>
-                </nav>
             </header>
-            <!-- Main container -->
+
             <section class="content">
-                <div id="myModal" class="modal fade" role="dialog"></div>
                 <div class="row">
-                    <!-- Left section: Search worker -->
                     <div class="left-section">
                         <div class="search-worker mb-3">
                             <label for="searchWorker" class="form-label">Buscar Trabajador:</label>
                             <input type="text" id="searchWorker" class="form-control" placeholder="Ingrese el nombre del trabajador" onkeyup="buscarTrabajador()">
                             <div id="searchResult" class="mt-2"></div>
                         </div>
-                        <!-- Campos ocultos para almacenar el ID del trabajador -->
+
                         <input type="hidden" id="worker-id">
                         <input type="hidden" id="worker-name">
                         <input type="hidden" id="worker-dni">
-                        <!-- Control de receso -->
+
                         <div id="main-worker" class="worker-box">
                             <h4 id="worker-name-display">Nombre del Trabajador</h4>
                             <div class="search-worker mb-3">
                                 <label for="dniWorker" class="form-label">DNI:</label>
                                 <input type="text" id="dniWorker" class="form-control" placeholder="Ingrese el DNI" maxlength="8" readonly>
                             </div>
-                            <!-- Selector para elegir la duración del receso -->
                             <div class="mb-3">
                                 <label for="recesoDuration" class="form-label">Duración del Receso:</label>
                                 <select id="recesoDuration" class="form-select">
@@ -134,7 +112,7 @@ $trabajadores = $stmt->fetchAll();
                             </div>
                         </div>
                     </div>
-                    <!-- Right section: Digital Clock -->
+
                     <div class="right-section">
                         <div class="clock-container">
                             <div class="digital-clock">
@@ -148,7 +126,7 @@ $trabajadores = $stmt->fetchAll();
                         </div>
                     </div>
                 </div>
-                <!-- Tabla de recesos -->
+
                 <div class="abajo">
                     <table id="tblvisita" class="table display table-bordered table-striped">
                         <thead class="thead-dark">
@@ -172,17 +150,12 @@ $trabajadores = $stmt->fetchAll();
                                         <td><?= $trabajador['hora_receso'] ?></td>
                                         <td><?= $trabajador['hora_vuelta'] ?? 'N/A' ?></td>
                                         <td>
-                                            <span id="contador-<?= $trabajador['id'] ?>" class="contador contador-verde">
-                                                <!-- El contador se actualiza en tiempo real con JavaScript -->
-                                            </span>
+                                            <span id="contador-<?= $trabajador['id'] ?>" class="contador contador-verde"></span>
                                         </td>
                                         <td>
                                             <button class="btn btn-danger" onclick="finalizarReceso(<?= $trabajador['id'] ?>)">Pausar Receso</button>
                                         </td>
                                     </tr>
-                                    <script>
-                                        iniciarContador(<?= $trabajador['id'] ?>, "<?= $trabajador['hora_receso'] ?>", <?= $trabajador['duracion'] ?>);
-                                    </script>
                                 <?php endforeach; ?>
                             <?php else : ?>
                                 <tr>
@@ -192,9 +165,12 @@ $trabajadores = $stmt->fetchAll();
                         </tbody>
                     </table>
                 </div>
+            </section>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="script.js"></script>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>

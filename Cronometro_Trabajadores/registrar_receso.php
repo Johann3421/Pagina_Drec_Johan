@@ -1,6 +1,5 @@
 <?php
 date_default_timezone_set('America/Lima');
-// Configuración de conexión a la base de datos
 $dsn = "mysql:host=localhost;dbname=login_system;charset=utf8mb4";
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -13,13 +12,13 @@ try {
     die("Conexión fallida: " . $e->getMessage());
 }
 
-// Verificar si los datos han sido enviados correctamente
+// Verificar que los datos han sido enviados
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['duracion'])) {
     $worker_id = $_POST['id'];
-    $duracion = $_POST['duracion'];
-    $hora_receso = date('Y-m-d H:i:s'); // Hora actual en formato de base de datos
+    $duracion = (int)$_POST['duracion'];
+    $hora_receso = date('Y-m-d H:i:s');
 
-    // Actualizar la tabla `trabajadores` con la `hora_receso` y la `duracion`
+    // Actualizar la base de datos con la hora de receso y duración
     $stmt = $conn->prepare("UPDATE trabajadores SET hora_receso = :hora_receso, duracion = :duracion, hora_vuelta = NULL WHERE id = :id");
     $stmt->execute([
         ':hora_receso' => $hora_receso,
@@ -27,16 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['duracio
         ':id' => $worker_id
     ]);
 
-    // Verificar si se actualizó algún registro
-    if ($stmt->rowCount()) {
-        // Enviar respuesta JSON con éxito y la hora de inicio del receso
-        echo json_encode(['status' => 'success', 'hora_receso' => $hora_receso, 'duracion' => $duracion]);
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['status' => 'success', 'id' => $worker_id, 'hora_receso' => $hora_receso, 'duracion' => $duracion]);
     } else {
-        // Enviar respuesta JSON con error si no se actualizó ningún registro
-        echo json_encode(['status' => 'error', 'message' => 'No se pudo registrar el receso.']);
+        echo json_encode(['status' => 'error', 'message' => 'No se pudo registrar el receso en la base de datos.']);
     }
 } else {
-    // Error si faltan datos
-    echo json_encode(['status' => 'error', 'message' => 'Datos incompletos.']);
+    echo json_encode(['status' => 'error', 'message' => 'Datos incompletos en la solicitud.']);
 }
 ?>
