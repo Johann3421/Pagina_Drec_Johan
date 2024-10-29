@@ -12,7 +12,6 @@ function registrarReceso() {
         return;
     }
 
-    // Enviar datos al servidor para registrar el receso
     fetch('registrar_receso.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -42,13 +41,12 @@ function registrarReceso() {
                     </td>
                 </tr>`;
 
-            // Agregar la nueva fila al DOM y eliminar el mensaje "No hay datos"
             document.getElementById('tbody-visitas').insertAdjacentHTML('beforeend', newRow);
             const noDataRow = document.querySelector('#tbody-visitas .no-data');
             if (noDataRow) noDataRow.remove();
 
             // Iniciar el contador para la nueva fila
-            iniciarContador(id, horaReceso, duracion);
+            iniciarContador(id, duracion * 60); // Pasar duración en segundos
         } else {
             alert(data.message || "Hubo un error al registrar el receso.");
         }
@@ -122,13 +120,16 @@ function iniciarContadores() {
 // Función para iniciar un contador individual con un tiempo restante específico
 function iniciarContador(id, tiempoRestante) {
     const contadorElemento = document.getElementById(`contador-${id}`);
-    
+
     if (!contadorElemento) {
         console.error(`Elemento contador-${id} no encontrado.`);
         return;
     }
 
-    // Iniciar intervalo para actualizar el contador cada segundo
+    // Asegurar que el contador empiece en verde
+    contadorElemento.classList.remove('contador-rojo');
+    contadorElemento.classList.add('contador-verde');
+
     const intervalo = setInterval(() => {
         if (tiempoRestante > 0) {
             const minutos = Math.floor(tiempoRestante / 60);

@@ -107,12 +107,9 @@ $total_paginas = ceil($total_filas / $limite);
           <span class="brand-text font-weight-light">DRE-HUÁNUCO</span>
         </div>
       </a>
-
-
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- User Panel -->
-
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -135,6 +132,12 @@ $total_paginas = ceil($total_filas / $limite);
               <a href="Cronometro_Trabajadores/Cronometro_welcome.php" class="nav-link">
                 <i class="material-icons">access_time</i>
                 <p>Cronometro</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Cronometro_Trabajadores/reporte_recesos.php" class="nav-link">
+                <i class="material-icons">assessment</i>
+                <p>Recesos</p>
               </a>
             </li>
           </ul>
@@ -164,9 +167,10 @@ $total_paginas = ceil($total_filas / $limite);
         </div>
         <nav>
           <ul class="nav-links">
-            <li><a href="welcome.php">Registrar Visita</a></li>
+            <li><a href="welcome.php">Visita</a></li>
             <li><a href="reporte.php">Reporte</a></li>
             <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
+            <li><a href="./Cronometro_Trabajadores/reporte_recesos.php">Recesos</a></li>
           </ul>
         </nav>
       </header>

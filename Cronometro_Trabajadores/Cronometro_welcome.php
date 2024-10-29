@@ -65,6 +65,12 @@ $trabajadores = $stmt->fetchAll();
                                 <p>Cronometro</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="reporte_recesos.php" class="nav-link">
+                                <i class="material-icons">assessment</i>
+                                <p>Recesos</p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -76,6 +82,14 @@ $trabajadores = $stmt->fetchAll();
                     <img src="../imagenes/logo_dre.png" alt="Logo de la marca">
                     <span class="logo-text">DIRECCION REGIONAL DE EDUCACION HUÁNUCO</span>
                 </div>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="../welcome.php">Visita</a></li>
+                        <li><a href="../reporte.php">Reporte</a></li>
+                        <li><a href="#">Cronometro</a></li>
+                        <li><a href="reporte_recesos.php">Recesos</a></li>
+                    </ul>
+                </nav>
             </header>
 
             <section class="content">

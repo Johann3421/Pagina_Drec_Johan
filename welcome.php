@@ -190,6 +190,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <p>Cronometro</p>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="Cronometro_Trabajadores/reporte_recesos.php" class="nav-link">
+                <i class="material-icons">assessment</i>
+                <p>Recesos</p>
+              </a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -206,9 +212,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <nav>
           <ul class="nav-links">
-            <li><a href="welcome.php">Registrar Visita</a></li>
+            <li><a href="welcome.php">Visita</a></li>
             <li><a href="reporte.php">Reporte</a></li>
             <li><a href="./Cronometro_Trabajadores/Cronometro_welcome.php">Cronometro</a></li>
+            <li><a href="./Cronometro_Trabajadores/reporte_recesos.php">Recesos</a></li>
           </ul>
         </nav>
       </header>

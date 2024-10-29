@@ -1,14 +1,16 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;800&display=swap');
+
 body {
     background-color: #f4f6f9;
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
+/* Header Style */
 .header {
     background-color: #00aeff;
     display: flex;
     justify-content: space-between;
-    /* Asegura que el logo esté a la izquierda y lo demás a la derecha */
     align-items: center;
     height: 85px;
     padding: 5px 10%;
@@ -27,26 +29,21 @@ body {
 
 .header .logo img {
     height: 100px;
-    /* Tamaño más grande para el logo */
     width: auto;
-    transition: all 0.3s;
-    margin-left: -30%;
+    transition: transform 0.3s;
+    margin-left: -20%;
 }
 
 .header .logo img:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
 }
 
 .header .logo-text {
     font-size: 24px;
-    /* Ajusta el tamaño del texto */
     font-weight: 700;
     color: #fff;
-    /* Color del texto */
     margin-left: 15px;
-    /* Separación entre el logo y el texto */
     text-transform: uppercase;
-    /* Hace que el texto esté en mayúsculas */
 }
 
 .header .nav-links {
@@ -62,19 +59,20 @@ body {
 
 .header .nav-links li:hover {
     transform: scale(1.1);
+    transition: transform 0.2s;
 }
 
 .header .nav-links a {
-    font-size: 700;
+    font-weight: 700;
     color: #000000;
     text-decoration: none;
 }
 
-.header .nav-links li a:hover {
+.header .nav-links a:hover {
     color: #ffbc0e;
 }
 
-.header .btn-1 button {
+.header .btn button {
     margin-left: 20px;
     font-weight: 700;
     color: #1b3039;
@@ -83,14 +81,31 @@ body {
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    transition: all 0.3s ease 0s;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
-.header .btn-1 button:hover {
+.header .btn button:hover {
     background-color: #e2f1f8;
     color: #ffbc0e;
     transform: scale(1.1);
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header {
+        padding: 0 5%;
+    }
+    .header .logo img {
+        height: 50px;
+    }
+    .header .logo-text {
+        font-size: 20px;
+    }
+    .header .nav-links li {
+        padding: 0 10px;
+    }
+}
+
 
 .nav-links {
     display: flex;
