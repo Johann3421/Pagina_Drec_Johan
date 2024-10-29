@@ -154,7 +154,7 @@ $trabajadores = $stmt->fetchAll();
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-visitas">
+                        <tbody id="tbody-visitas" onclick="manejarClickBoton(event)">
                             <?php if (!empty($trabajadores)) : ?>
                                 <?php foreach ($trabajadores as $index => $trabajador) : ?>
                                     <tr id="fila_<?= $trabajador['id'] ?>">
@@ -167,7 +167,11 @@ $trabajadores = $stmt->fetchAll();
                                             <span id="contador-<?= $trabajador['id'] ?>" class="contador contador-verde"></span>
                                         </td>
                                         <td>
-                                            <button class="btn btn-danger" onclick="finalizarReceso(<?= $trabajador['id'] ?>)">Pausar Receso</button>
+
+                                            <button class="btn btn-danger"
+                                                onclick="finalizarReceso(<?= $trabajador['id'] ?>)">
+                                                <i class="fas fa-stop"></i> Finalizar
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -177,6 +181,8 @@ $trabajadores = $stmt->fetchAll();
                                 </tr>
                             <?php endif; ?>
                         </tbody>
+
+
                     </table>
                 </div>
             </section>

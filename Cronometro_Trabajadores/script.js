@@ -1,5 +1,6 @@
 let recesosActivos = {};
 let numeroFila = 1;
+let tiemposRestantes = {};
 
 function registrarReceso() {
     const id = document.getElementById('worker-id').value;
@@ -15,17 +16,12 @@ function registrarReceso() {
     fetch('registrar_receso.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            id: id,
-            duracion: duracion
-        })
+        body: new URLSearchParams({ id, duracion })
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
             const horaReceso = data.hora_receso;
-
-            // Insertar una nueva fila en la tabla
             const newRow = `
                 <tr id="fila_${id}">
                     <td>${document.querySelectorAll('#tbody-visitas tr').length + 1}</td>
@@ -37,16 +33,14 @@ function registrarReceso() {
                         <span id="contador-${id}" class="contador contador-verde">${duracion}:00</span>
                     </td>
                     <td>
-                        <button class="btn btn-danger" onclick="finalizarReceso(${id})">Pausar Receso</button>
+                        <button class="btn btn-danger">
+                            <i class="fas fa-stop"></i> Finalizar
+                        </button>
                     </td>
                 </tr>`;
-
             document.getElementById('tbody-visitas').insertAdjacentHTML('beforeend', newRow);
-            const noDataRow = document.querySelector('#tbody-visitas .no-data');
-            if (noDataRow) noDataRow.remove();
 
-            // Iniciar el contador para la nueva fila
-            iniciarContador(id, duracion * 60); // Pasar duración en segundos
+            iniciarContador(id, duracion * 60); // Iniciar el contador
         } else {
             alert(data.message || "Hubo un error al registrar el receso.");
         }
@@ -56,12 +50,13 @@ function registrarReceso() {
 
 
 
-// Finalizar el receso y actualizar la tabla
+
+// Función para finalizar el receso
 function finalizarReceso(id) {
     const contadorElemento = document.getElementById(`contador-${id}`);
-    
+
     if (!contadorElemento || contadorElemento.textContent === "00:00") {
-        alert("El tiempo de receso ya ha terminado o no está activo.");
+        alert("El receso ya ha terminado o no está activo.");
         return;
     }
 
@@ -75,18 +70,17 @@ function finalizarReceso(id) {
         if (data.status === 'success') {
             const horaVuelta = data.hora_vuelta;
 
-            // Actualizar la fila correspondiente con la hora de vuelta
             const fila = document.getElementById(`fila_${id}`);
             if (fila) {
                 fila.cells[4].textContent = horaVuelta;
             }
 
-            // Limpiar el intervalo del contador y eliminarlo del objeto de recesos activos
             clearInterval(recesosActivos[id]);
             delete recesosActivos[id];
             contadorElemento.textContent = "00:00";
-            localStorage.removeItem(`receso_${id}`); // Limpiar el receso en localStorage
-            setTimeout(() => fila.remove(), 1000); // Opcional: remover la fila después
+            localStorage.removeItem(`receso_${id}`);
+
+            setTimeout(() => fila.remove(), 1000);
         } else {
             alert(data.message || "Hubo un error al finalizar el receso.");
         }
@@ -94,6 +88,39 @@ function finalizarReceso(id) {
     .catch(error => console.error('Error:', error));
 }
 
+
+// Función para alternar entre Pausar y Reanudar el contador
+function alternarPausaReanudar(id, boton) {
+    const icono = boton.querySelector('i');
+    const contadorElemento = document.getElementById(`contador-${id}`);
+    const pausado = boton.getAttribute('data-pausado') === 'true'; // Verificar estado actual
+
+    if (pausado) {
+        // Reanudar el contador
+        const tiempoRestante = tiemposRestantes[id];
+        iniciarContador(id, tiempoRestante);
+
+        // Cambiar a "Pausar" con ícono de pausa y color amarillo
+        boton.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+        boton.classList.remove('btn-success');
+        boton.classList.add('btn-warning');
+        boton.setAttribute('data-pausado', 'false'); // Cambiar estado
+    } else {
+        // Pausar el contador
+        clearInterval(recesosActivos[id]);
+        delete recesosActivos[id];
+
+        // Guardar tiempo restante
+        const [minutos, segundos] = contadorElemento.textContent.split(':').map(Number);
+        tiemposRestantes[id] = minutos * 60 + segundos;
+
+        // Cambiar a "Reanudar" con ícono de play y color verde
+        boton.innerHTML = '<i class="fas fa-play"></i> Reanudar';
+        boton.classList.remove('btn-warning');
+        boton.classList.add('btn-success');
+        boton.setAttribute('data-pausado', 'true'); // Cambiar estado
+    }
+}
 
 
 // Función para cargar y mostrar contadores en base al tiempo restante del servidor
@@ -117,34 +144,32 @@ function iniciarContadores() {
     .catch(error => console.error('Error en la solicitud de tiempos restantes:', error));
 }
 
-// Función para iniciar un contador individual con un tiempo restante específico
+// Función para iniciar un contador individual
 function iniciarContador(id, tiempoRestante) {
     const contadorElemento = document.getElementById(`contador-${id}`);
 
     if (!contadorElemento) {
-        console.error(`Elemento contador-${id} no encontrado.`);
+        console.error(`Contador no encontrado para el trabajador ${id}.`);
         return;
     }
 
-    // Asegurar que el contador empiece en verde
-    contadorElemento.classList.remove('contador-rojo');
-    contadorElemento.classList.add('contador-verde');
-
-    const intervalo = setInterval(() => {
+    recesosActivos[id] = setInterval(() => {
         if (tiempoRestante > 0) {
             const minutos = Math.floor(tiempoRestante / 60);
             const segundos = tiempoRestante % 60;
-            contadorElemento.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+            contadorElemento.textContent = 
+                `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
             tiempoRestante--;
         } else {
-            // Cambiar a rojo cuando el tiempo se agote
             contadorElemento.classList.remove('contador-verde');
             contadorElemento.classList.add('contador-rojo');
             contadorElemento.textContent = "00:00";
-            clearInterval(intervalo);
+            clearInterval(recesosActivos[id]);
         }
     }, 1000);
 }
+
+
 
 
 
