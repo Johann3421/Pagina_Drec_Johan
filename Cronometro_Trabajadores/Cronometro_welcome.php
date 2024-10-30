@@ -114,11 +114,7 @@ $trabajadores = $stmt->fetchAll();
                             <div class="mb-3">
                                 <label for="recesoDuration" class="form-label">Duración del Receso:</label>
                                 <select id="recesoDuration" class="form-select">
-                                    <option value="5">5 minutos</option>
-                                    <option value="10">10 minutos</option>
                                     <option value="15">15 minutos</option>
-                                    <option value="20">20 minutos</option>
-                                    <option value="30">30 minutos</option>
                                 </select>
                             </div>
                             <div class="btn-group">

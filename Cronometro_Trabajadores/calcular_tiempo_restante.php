@@ -30,15 +30,19 @@ foreach ($trabajadores as $trabajador) {
     $intervalo = $finReceso->getTimestamp() - $ahora->getTimestamp(); // Tiempo en segundos
 
     if ($intervalo > 0) {
+        // Tiempo restante positivo
         $resultado[] = [
             'id' => $trabajador['id'],
-            'tiempo_restante' => $intervalo
+            'tiempo_restante' => $intervalo,
+            'en_tiempo_extra' => false
         ];
     } else {
-        // Si el tiempo ya expiró, marcarlo como 0
+        // Tiempo ya expirado, mostrar desde 0 como tiempo extra positivo
+        $tiempoExtra = abs($intervalo);
         $resultado[] = [
             'id' => $trabajador['id'],
-            'tiempo_restante' => 0
+            'tiempo_restante' => $tiempoExtra,
+            'en_tiempo_extra' => true
         ];
     }
 }

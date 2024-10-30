@@ -123,7 +123,6 @@ function alternarPausaReanudar(id, boton) {
 }
 
 
-// Función para cargar y mostrar contadores en base al tiempo restante del servidor
 function iniciarContadores() {
     fetch('calcular_tiempo_restante.php', {
         method: 'GET',
@@ -142,7 +141,6 @@ function iniciarContadores() {
     .catch(error => console.error('Error en la solicitud de tiempos restantes:', error));
 }
 
-
 function iniciarContador(id, tiempoRestante, enTiempoExtra = false) {
     const contadorElemento = document.getElementById(`contador-${id}`);
 
@@ -151,8 +149,16 @@ function iniciarContador(id, tiempoRestante, enTiempoExtra = false) {
         return;
     }
 
+    if (enTiempoExtra) {
+        contadorElemento.classList.remove('contador-verde');
+        contadorElemento.classList.add('contador-rojo');
+    } else {
+        contadorElemento.classList.remove('contador-rojo');
+        contadorElemento.classList.add('contador-verde');
+    }
+
     recesosActivos[id] = setInterval(() => {
-        if (tiempoRestante > 0 && !enTiempoExtra) {
+        if (!enTiempoExtra && tiempoRestante > 0) {
             // Contador verde mientras hay tiempo restante
             const minutos = Math.floor(tiempoRestante / 60);
             const segundos = tiempoRestante % 60;
@@ -160,23 +166,22 @@ function iniciarContador(id, tiempoRestante, enTiempoExtra = false) {
                 `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
             tiempoRestante--;
         } else {
-            // Cambiar a contador rojo si tiempo restante es 0 o si enTiempoExtra es true
+            // Cambiar a tiempo extra positivo desde 00:00
             if (!enTiempoExtra) {
-                // Inicia el tiempo extra y cambia el estilo a rojo
                 contadorElemento.classList.remove('contador-verde');
                 contadorElemento.classList.add('contador-rojo');
-                tiempoRestante = 0; // Reiniciar en 0 para el tiempo extra
+                tiempoRestante = 0;
                 enTiempoExtra = true;
             }
 
             const minutos = Math.floor(tiempoRestante / 60);
-            const segundos = Math.abs(tiempoRestante % 60);
-            contadorElemento.textContent = `-${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-            tiempoRestante--; // Contar en negativo
+            const segundos = tiempoRestante % 60;
+            contadorElemento.textContent = 
+                `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+            tiempoRestante++; // Contar en positivo
         }
     }, 1000);
 }
-
 
 
 

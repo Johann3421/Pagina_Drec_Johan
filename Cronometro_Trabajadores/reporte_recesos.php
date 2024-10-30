@@ -21,8 +21,10 @@ $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 $offset = ($pagina - 1) * $limite;
 
 // Construir la consulta base
-$sql_busqueda = "SELECT id, hora_receso, nombre, dni, duracion, hora_vuelta, estado 
-                 FROM recesos WHERE (nombre LIKE ? OR dni LIKE ?)";
+$sql_busqueda = "SELECT id, hora_receso, nombre, dni, duracion, exceso, hora_vuelta, estado 
+                 FROM recesos 
+                 WHERE (nombre LIKE ? OR dni LIKE ?)";
+
 
 // Añadir filtro de fechas si están presentes
 if (!empty($fechaDesde) && !empty($fechaHasta)) {
@@ -210,7 +212,8 @@ $total_paginas = ceil($total_filas / $limite);
                                                 <th>Hora de Receso</th>
                                                 <th>Trabajador</th>
                                                 <th>DNI</th>
-                                                <th>Duración (min)</th>
+                                                <th>Duración Usada (min)</th>
+                                                <th>Exceso (min)</th>
                                                 <th>Hora de Vuelta</th>
                                                 <th>Estado</th>
                                             </tr>
@@ -223,18 +226,20 @@ $total_paginas = ceil($total_filas / $limite);
                                                         <td><?= $receso['hora_receso'] ?></td>
                                                         <td><?= htmlspecialchars($receso['nombre']) ?></td>
                                                         <td><?= htmlspecialchars($receso['dni']) ?></td>
-                                                        <td><?= htmlspecialchars($receso['duracion']) ?></td>
+                                                        <td><?= htmlspecialchars($receso['duracion']) ?></td> <!-- Tiempo usado -->
+                                                        <td><?= htmlspecialchars($receso['exceso'] ?? 0) ?></td> <!-- Muestra 0 si exceso no está definido -->
                                                         <td><?= $receso['hora_vuelta'] ?? 'Pendiente' ?></td>
                                                         <td><?= htmlspecialchars($receso['estado']) ?></td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
                                                 <tr>
-                                                    <td colspan="7" class="text-center">No hay recesos registrados.</td>
+                                                    <td colspan="8" class="text-center">No hay recesos registrados.</td>
                                                 </tr>
                                             <?php endif; ?>
                                         </tbody>
                                     </table>
+
                                 </div>
 
                                 <nav>

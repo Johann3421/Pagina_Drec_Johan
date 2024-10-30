@@ -16,20 +16,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $worker_id = $_POST['id'];
     $hora_vuelta = date('Y-m-d H:i:s');
 
-    $stmt = $conn->prepare("SELECT hora_receso FROM trabajadores WHERE id = :id AND hora_vuelta IS NULL");
+    // Obtener la hora de receso y la duración programada del trabajador
+    $stmt = $conn->prepare("SELECT hora_receso, duracion FROM recesos WHERE trabajador_id = :id AND estado = 'activo'");
     $stmt->execute([':id' => $worker_id]);
-    $trabajador = $stmt->fetch();
+    $receso = $stmt->fetch();
 
-    if ($trabajador) {
-        $stmt = $conn->prepare("UPDATE trabajadores SET hora_vuelta = :hora_vuelta WHERE id = :id");
-        $stmt->execute([
+    if ($receso) {
+        // Calcular la duración real del receso en minutos
+        $horaReceso = new DateTime($receso['hora_receso']);
+        $horaVuelta = new DateTime($hora_vuelta);
+        $interval = $horaReceso->diff($horaVuelta);
+        $duracionUsada = ($interval->h * 60) + $interval->i + ($interval->s > 0 ? 1 : 0); // Redondear hacia arriba si hay segundos
+
+        // Calcular el exceso si la duración usada supera la duración programada
+        $duracionProgramada = (int)$receso['duracion'];
+        $exceso = max(0, $duracionUsada - $duracionProgramada);
+
+        // Actualizar la tabla recesos con hora de vuelta, duración real y exceso
+        $stmtUpdate = $conn->prepare("UPDATE recesos SET hora_vuelta = :hora_vuelta, duracion = :duracion_usada, exceso = :exceso, estado = 'finalizado' WHERE trabajador_id = :id AND estado = 'activo'");
+        $stmtUpdate->execute([
             ':hora_vuelta' => $hora_vuelta,
+            ':duracion_usada' => $duracionUsada,
+            ':exceso' => $exceso,
             ':id' => $worker_id
         ]);
 
-        // Actualizar el receso en la tabla `recesos`
-        $stmtReceso = $conn->prepare("UPDATE recesos SET hora_vuelta = :hora_vuelta, estado = 'finalizado' WHERE trabajador_id = :id AND estado = 'activo'");
-        $stmtReceso->execute([
+        // Actualizar la tabla trabajadores para establecer la hora de vuelta
+        $stmtUpdateTrabajador = $conn->prepare("UPDATE trabajadores SET hora_vuelta = :hora_vuelta WHERE id = :id");
+        $stmtUpdateTrabajador->execute([
             ':hora_vuelta' => $hora_vuelta,
             ':id' => $worker_id
         ]);
