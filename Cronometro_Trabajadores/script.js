@@ -125,7 +125,6 @@ function alternarPausaReanudar(id, boton) {
 
 // Función para cargar y mostrar contadores en base al tiempo restante del servidor
 function iniciarContadores() {
-    // Consultar el tiempo restante de todos los recesos activos desde el servidor
     fetch('calcular_tiempo_restante.php', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -133,9 +132,8 @@ function iniciarContadores() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            // Para cada trabajador con receso activo, iniciamos el contador
             data.trabajadores.forEach(trabajador => {
-                iniciarContador(trabajador.id, trabajador.tiempo_restante);
+                iniciarContador(trabajador.id, trabajador.tiempo_restante, trabajador.en_tiempo_extra);
             });
         } else {
             console.error("Error al obtener los tiempos restantes:", data.message);
@@ -144,8 +142,8 @@ function iniciarContadores() {
     .catch(error => console.error('Error en la solicitud de tiempos restantes:', error));
 }
 
-// Función para iniciar un contador individual
-function iniciarContador(id, tiempoRestante) {
+
+function iniciarContador(id, tiempoRestante, enTiempoExtra = false) {
     const contadorElemento = document.getElementById(`contador-${id}`);
 
     if (!contadorElemento) {
@@ -154,20 +152,32 @@ function iniciarContador(id, tiempoRestante) {
     }
 
     recesosActivos[id] = setInterval(() => {
-        if (tiempoRestante > 0) {
+        if (tiempoRestante > 0 && !enTiempoExtra) {
+            // Contador verde mientras hay tiempo restante
             const minutos = Math.floor(tiempoRestante / 60);
             const segundos = tiempoRestante % 60;
             contadorElemento.textContent = 
                 `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
             tiempoRestante--;
         } else {
-            contadorElemento.classList.remove('contador-verde');
-            contadorElemento.classList.add('contador-rojo');
-            contadorElemento.textContent = "00:00";
-            clearInterval(recesosActivos[id]);
+            // Cambiar a contador rojo si tiempo restante es 0 o si enTiempoExtra es true
+            if (!enTiempoExtra) {
+                // Inicia el tiempo extra y cambia el estilo a rojo
+                contadorElemento.classList.remove('contador-verde');
+                contadorElemento.classList.add('contador-rojo');
+                tiempoRestante = 0; // Reiniciar en 0 para el tiempo extra
+                enTiempoExtra = true;
+            }
+
+            const minutos = Math.floor(tiempoRestante / 60);
+            const segundos = Math.abs(tiempoRestante % 60);
+            contadorElemento.textContent = `-${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+            tiempoRestante--; // Contar en negativo
         }
     }, 1000);
 }
+
+
 
 
 

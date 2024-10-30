@@ -249,7 +249,6 @@ body {
         margin-bottom: 20px;
     }
 }
-
 .digital-clock {
     background: #2f363e;
     padding: 30px;
@@ -258,20 +257,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
     width: 300px;
     height: 150px;
-}
-
-.digital-clock::before {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #2f363e;
-    border: 3px solid #fff;
-    border-radius: 50%;
-    z-index: 1;
+    margin: 0 auto;
 }
 
 .time {
@@ -279,13 +267,19 @@ body {
     font-size: 50px;
     display: flex;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
+    gap: 10px;
 }
 
 .time span {
     color: #04fc43;
     font-weight: 600;
     text-shadow: 0 0 20px #0b9be8, 0 0 60px #04fc43;
+}
+
+.time .hour, .time .minute, .time .second {
+    min-width: 50px; /* Asegura que las horas, minutos y segundos tengan el mismo ancho */
+    text-align: center;
 }
 
 .time .hour {
@@ -303,9 +297,10 @@ body {
 .time .ampm {
     color: #fff;
     font-size: 20px;
-    position: relative;
-    top: 15px;
+    margin-left: 10px;
+    align-self: flex-end;
 }
+
 
 /* Asegurarse de que los estilos sean visualmente claros */
 .contador {
