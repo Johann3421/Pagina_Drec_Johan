@@ -33,7 +33,7 @@ function registrarReceso() {
                         <span id="contador-${id}" class="contador contador-verde">${duracion}:00</span>
                     </td>
                     <td>
-                        <button class="btn btn-danger">
+                        <button class="btn btn-danger" onclick="finalizarReceso(${id})">
                             <i class="fas fa-stop"></i> Finalizar
                         </button>
                     </td>
@@ -47,8 +47,6 @@ function registrarReceso() {
     })
     .catch(error => console.error('Error:', error));
 }
-
-
 
 
 // Función para finalizar el receso
@@ -182,13 +180,6 @@ function iniciarContador(id, tiempoRestante, enTiempoExtra = false) {
         }
     }, 1000);
 }
-
-
-
-
-
-
-
 
 // Actualización del reloj digital
 function actualizarRelojDigital() {

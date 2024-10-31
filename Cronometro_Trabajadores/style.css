@@ -166,8 +166,9 @@ body {
 /* Clock section styling */
 .clock-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center;     /* Centrar verticalmente */
+    height: 100%;            /* Asegura que ocupe el 100% del contenedor padre */
 }
 
 .clock {
@@ -194,7 +195,10 @@ body {
 }
 
 .digital-clock .time {
-    font-weight: bold;
+    font-size: 2em;          /* Ajusta el tamaño de fuente según prefieras */
+    color: #333;             /* Color del texto */
+    font-family: Arial, sans-serif;
+    text-align: center;
 }
 
 /* Break timer box */
@@ -253,7 +257,7 @@ body {
     background: #2f363e;
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 10px 50px 70px rgba(0, 0, 0, 0.25);
+    box-shadow: 10px 50px 70px rgba(254, 254, 254, 0.25);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -272,7 +276,7 @@ body {
 }
 
 .time span {
-    color: #04fc43;
+    color: #ffffff;
     font-weight: 600;
     text-shadow: 0 0 20px #0b9be8, 0 0 60px #04fc43;
 }
@@ -283,15 +287,15 @@ body {
 }
 
 .time .hour {
-    color: #ff2972;
+    color: #ffffff;
 }
 
 .time .minute {
-    color: #fee800;
+    color: #ffffff;
 }
 
 .time .second {
-    color: #04fc43;
+    color: #ffffff;
 }
 
 .time .ampm {

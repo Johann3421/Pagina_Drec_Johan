@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['username'])) {
+  header('Location: index.php');
+  exit();
+}
 // Conexión a la base de datos
 $dsn = "mysql:host=localhost;dbname=login_system;charset=utf8mb4";
 $options = [
