@@ -83,48 +83,8 @@ if (!isset($_SESSION['username'])) {
   header('Location: index.php');
   exit();
 }
-
-$persona = null;
-$dni_error = "";
-$nombre = "";
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $token = 'apis-token-10779.deFjdQHVSuenRlLS27jpqtmQ0SJV4hfj';  // Token API
-  $dni = $_POST['dni'] ?? '';
-  $nombre = $_POST['nombre'] ?? '';
-
-  // Validar si el DNI está vacío
-  if (empty($dni)) {
-    $dni_error = "El DNI es obligatorio.";
-  } else {
-    // Iniciar llamada a la API
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-      CURLOPT_URL => 'https://api.apis.net.pe/v2/reniec/dni?numero=' . $dni,
-      CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_SSL_VERIFYPEER => false,
-      CURLOPT_HTTPHEADER => array(
-        'Referer: https://apis.net.pe/consulta-dni-api',
-        'Authorization: Bearer ' . $token
-      ),
-    ));
-
-    $response = curl_exec($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE); // Obtener el código de respuesta HTTP
-    curl_close($curl);
-
-    // Decodificar la respuesta de la API
-    $persona = json_decode($response);
-
-    // Si hubo un error en la llamada a la API o la respuesta es incorrecta
-    if ($httpCode !== 200 || isset($persona->error)) {
-      $dni_error = "No se encontró el DNI o ocurrió un error en la consulta.";
-    } else {
-      // Construir el nombre completo
-      $nombre = trim($persona->nombres . " " . $persona->apellidoPaterno . " " . $persona->apellidoMaterno);
-    }
-  }
-}
 ?>
+
 
 
 <!DOCTYPE html>
@@ -270,6 +230,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           <label for="ndocu">DNI:</label>
                           <input type="text" maxlength="8" class="form-control form-control-sm" name="dni" id="ndocu" placeholder="Nro Documento" onkeypress="return esNumerico(event)" onkeydown="return noSubmitEnter(event)" onblur="buscarPorDNI()">
                           <div id="dni_error" class="text-danger" style="font-size: 12px;"></div>
+
+                          <!-- Mostrar la imagen si está disponible -->
+                          <?php if (!empty($foto_base64)): ?>
+                            <img src="data:image/jpeg;base64,<?php echo $foto_base64; ?>" alt="Foto del usuario" style="max-width: 100px; margin-top: 10px;">
+                          <?php endif; ?>
                         </div>
                         <div class="col-lg-9 col-md-9 col-sm-12">
                           <div class="form-group">

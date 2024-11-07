@@ -48,7 +48,6 @@ function registrarReceso() {
     .catch(error => console.error('Error:', error));
 }
 
-
 // Función para finalizar el receso
 function finalizarReceso(id) {
     const contadorElemento = document.getElementById(`contador-${id}`);
